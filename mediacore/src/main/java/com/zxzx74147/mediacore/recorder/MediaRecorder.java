@@ -22,7 +22,7 @@ public class MediaRecorder {
     private AudioEncoder mAudioEncoder;
     private VideoEncoder mVideoEncoder;
     private Mp4Muxer mMp4Muxer;
-    private IRecorderListener mRecorderListener = null;
+    private IProcessListener mRecorderListener = null;
 
 
     public MediaRecorder(String outputFileName) {
@@ -31,7 +31,7 @@ public class MediaRecorder {
 
 
         mMp4Muxer = new Mp4Muxer();
-        mMp4Muxer.setOutputFile(FileUtil.getFile(outputFileName);
+        mMp4Muxer.setOutputFile(FileUtil.getFile(outputFileName));
         mMp4Muxer.init();
 
         mAudioEncoder = new AudioEncoder();
@@ -43,16 +43,20 @@ public class MediaRecorder {
         mVideoSource.setVideoEncoder(mVideoEncoder);
     }
 
-    public void setRecorderListener(IRecorderListener listener){
+    public void setRecorderListener(IProcessListener listener){
         mRecorderListener = listener;
     }
 
     public void start() {
         TimeStampGenerator.sharedInstance().reset();
-        mAudioSource.prepare();
-        mAudioSource.start();
-        mVideoSource.prepare();
-        mVideoSource.start();
+        try {
+            mAudioSource.prepare();
+            mAudioSource.start();
+            mVideoSource.prepare();
+            mVideoSource.start();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public void pause() {
