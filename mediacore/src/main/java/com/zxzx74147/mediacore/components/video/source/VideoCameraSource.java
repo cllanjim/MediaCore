@@ -4,6 +4,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import com.zxzx74147.mediacore.components.video.encoder.VideoEncoder;
+import com.zxzx74147.mediacore.components.video.encoder.VideoMp4Config;
 import com.zxzx74147.mediacore.components.video.filter.helper.MagicFilterType;
 import com.zxzx74147.mediacore.components.video.source.camera.CameraHandler;
 import com.zxzx74147.mediacore.components.video.source.camera.CameraThread;
@@ -87,7 +88,7 @@ public class VideoCameraSource implements IVideoSource {
         rh.post(new Runnable() {
             @Override
             public void run() {
-                mVideoEncoder.prepare();
+                mVideoEncoder.prepare(new VideoMp4Config());
                 mVideoEncoder.start();
                 rh.sendEncoderAvailable(mVideoEncoder.getEncoderSurface());
                 rh.sendEncoderSurfaceChanged(mVideoEncoder.getConfig().width,

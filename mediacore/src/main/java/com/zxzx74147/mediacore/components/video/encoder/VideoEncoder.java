@@ -26,7 +26,8 @@ public class VideoEncoder {
     private Surface mEncodesurface;
     private VideoMp4Config mConfig = new VideoMp4Config();
 
-    public void prepare() {
+    public void prepare(VideoMp4Config config) {
+        mConfig = config;
         release();
 
         MediaFormat format = MediaFormat.createVideoFormat(VideoMp4Config.MIME_TYPE, mConfig.width, mConfig.height);

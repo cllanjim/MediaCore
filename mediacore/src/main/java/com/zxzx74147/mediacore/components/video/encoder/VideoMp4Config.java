@@ -7,9 +7,9 @@ package com.zxzx74147.mediacore.components.video.encoder;
 public class VideoMp4Config {
     public static final String MIME_TYPE = "video/avc";    // H.264 Advanced Video Coding
 
-    public final int width = 480;
-    public final int height = 640;
-    public final int bitrate = 1000 * 1024;            // 1Mbps
-    public final int framerate = 24;               // 24fps
-    public final int iframe_interval = 5;          // 5 seconds between I-frames
+    public int width = 480;
+    public int height = 640;
+    public int bitrate = 1000 * 1024;            // 1Mbps
+    public int framerate = 24;               // 24fps
+    public int iframe_interval = 5;          // 5 seconds between I-frames
 }

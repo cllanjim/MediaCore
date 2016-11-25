@@ -64,6 +64,7 @@ public class AudioMicSource implements IAudioSource {
     @Override
     public void setAudioEncoder(AudioEncoder encoder) {
         mAudioEncoder = encoder;
+        mAudioEncoder.setBufferSize(mBufferSize);
         mAudioEncoder.prepare();
         mAudioEncoder.start();
     }

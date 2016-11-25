@@ -29,5 +29,11 @@
             android:onClick="@{handler::onRecord}"
             android:text="Start Record test"
             android:layout_height="wrap_content" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:onClick="@{handler::onVideoEdit}"
+            android:text="Start Edit test"
+            android:layout_height="wrap_content" />
     </LinearLayout>
 </layout>

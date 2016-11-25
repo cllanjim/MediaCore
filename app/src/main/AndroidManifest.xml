@@ -28,7 +28,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".test.VideoSourceTestActivity" />
-        <activity android:name=".test.RecordTestActivity"></activity>
+        <activity android:name=".test.RecordTestActivity" />
+        <activity android:name=".test.VideoEditorTestActivity"></activity>
     </application>
 
 </manifest>

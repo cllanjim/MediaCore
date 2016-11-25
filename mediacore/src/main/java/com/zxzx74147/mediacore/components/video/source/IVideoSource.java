@@ -4,12 +4,14 @@ import android.view.SurfaceView;
 
 import com.zxzx74147.mediacore.components.video.encoder.VideoEncoder;
 
+import java.io.IOException;
+
 /**
  * Created by zhengxin on 2016/11/21.
  */
 
 public interface IVideoSource {
-    void prepare();
+    void prepare() throws IOException;
 
     void start();
 

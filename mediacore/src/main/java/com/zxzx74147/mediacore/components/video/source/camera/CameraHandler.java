@@ -39,7 +39,7 @@ public class CameraHandler extends Handler {
      * Call from render thread.
      */
     public CameraHandler(CameraThread rt) {
-        mWeakCameraThread = new WeakReference<CameraThread>(rt);
+        mWeakCameraThread = new WeakReference<>(rt);
     }
 
     /**

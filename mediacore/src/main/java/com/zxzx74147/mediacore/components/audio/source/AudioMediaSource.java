@@ -3,8 +3,10 @@ package com.zxzx74147.mediacore.components.audio.source;
 import android.media.MediaCodec;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
+import android.net.Uri;
 import android.util.Log;
 
+import com.zxzx74147.mediacore.MediaCore;
 import com.zxzx74147.mediacore.components.audio.encoder.AudioEncoder;
 
 import java.io.File;
@@ -23,6 +25,7 @@ public class AudioMediaSource implements IAudioSource {
 
     private MediaExtractor mExtractor = null;
     private File mFile = null;
+    private Uri mUri = null;
     private int mAudioTrack = -1;
     private Thread mExtractThread = null;
     private AudioEncoder mEncoder = null;
@@ -41,9 +44,25 @@ public class AudioMediaSource implements IAudioSource {
         }
     }
 
+    public AudioMediaSource(Uri uri) {
+        mUri = uri;
+        if (mUri == null ) {
+            throw new IllegalArgumentException("media file is not exist" + (mUri != null ? mUri.toString() : ""));
+        }
+        mExtractor = new MediaExtractor();
+        try {
+            mExtractor.setDataSource(MediaCore.getContext(),mUri,null);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     @Override
     public void prepare() throws IOException {
+        if(mEncoder==null){
+            throw new IllegalArgumentException("audio encoder is null! " );
+        }
         int numTracks = mExtractor.getTrackCount();
         for (int i = 0; i < numTracks; ++i) {
             MediaFormat format = mExtractor.getTrackFormat(i);
@@ -54,17 +73,21 @@ public class AudioMediaSource implements IAudioSource {
                 mAudioDecoder = MediaCodec.createDecoderByType(mime);
                 mAudioDecoder.configure(format, null, null, 0);
                 mAudioDecoder.start();
+                break;
             }
         }
-        if (mAudioTrack <= 0) {
+        if (mAudioTrack < 0) {
             throw new IllegalArgumentException("media file does not include audio track! " + (mFile != null ? mFile.toString() : ""));
         }
+        mEncoder.setBufferSize(1024*256);
+        mEncoder.prepare();
+        mEncoder.start();
 
     }
 
     @Override
     public void start() {
-        if (mEncoder != null) {
+        if (mEncoder == null) {
             throw new IllegalStateException("The audio encoder is null ! ");
         }
         mExtractThread = new Thread(mExtractRunnable);

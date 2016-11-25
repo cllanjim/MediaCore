@@ -12,7 +12,7 @@ public interface IProcessListener {
 
     void onError(int error,String errorStr);
 
-    void onProgress(long duration);
+    void onProgress(int progress);
 
     void onComplete(Uri uri);
 }
