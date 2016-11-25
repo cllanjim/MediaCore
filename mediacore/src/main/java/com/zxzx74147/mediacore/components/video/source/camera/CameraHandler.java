@@ -5,6 +5,8 @@ import android.os.Message;
 import android.util.Log;
 import android.view.Surface;
 
+import com.zxzx74147.mediacore.components.video.filter.helper.MagicFilterType;
+
 import java.lang.ref.WeakReference;
 
 /**
@@ -27,6 +29,7 @@ public class CameraHandler extends Handler {
     private static final int MSG_ENCODER_SIZE_CHANGED = 9;
     private static final int MSG_ENCODER_PAUSE = 10;
     private static final int MSG_ENCODER_RESUME = 11;
+    private static final int MSG_FILTER_CHANGED = 12;
 
     // This shouldn't need to be a weak ref, since we'll go away when the Looper quits,
     // but no real harm in it.
@@ -130,6 +133,10 @@ public class CameraHandler extends Handler {
         sendMessage(obtainMessage(MSG_ENCODER_RESUME));
     }
 
+    public void sendFilterChanged(MagicFilterType type) {
+        sendMessage(obtainMessage(MSG_FILTER_CHANGED,
+                type));
+    }
     /**
      * Sends the "redraw" message.  Forces an immediate redraw.
      * <p/>
@@ -186,6 +193,9 @@ public class CameraHandler extends Handler {
                 break;
             case MSG_ENCODER_RESUME:
                 CameraThread.resumeRecord();
+                break;
+            case MSG_FILTER_CHANGED:
+                CameraThread.changeFilter((MagicFilterType) msg.obj);
                 break;
             default:
                 throw new RuntimeException("unknown message " + what);

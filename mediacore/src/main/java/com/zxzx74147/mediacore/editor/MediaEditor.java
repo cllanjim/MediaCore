@@ -16,4 +16,6 @@ public class MediaEditor {
     private AudioEncoder mAudioEncoder;
     private VideoEncoder mVideoEncoder;
     private Mp4Muxer mMp4Muxer;
+
+
 }

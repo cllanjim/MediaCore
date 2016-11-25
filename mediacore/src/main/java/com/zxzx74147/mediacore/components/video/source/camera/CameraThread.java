@@ -58,6 +58,8 @@ public class CameraThread extends Thread implements SurfaceTexture.OnFrameAvaila
     private FloatBuffer mGLCubeBuffer;
     private FloatBuffer mGLTextureBuffer;
 
+    private MagicFilterType mFilterType = MagicFilterType.NONE;
+
     private boolean mIsRcording = false;
 
 
@@ -230,7 +232,7 @@ public class CameraThread extends Thread implements SurfaceTexture.OnFrameAvaila
             mRenderHeight = mRenderWindowSurface.getHeight();
             mCameraTexture.setOnFrameAvailableListener(this);
 
-            mImageFilter = MagicFilterFactory.initFilters(MagicFilterType.NONE);
+            mImageFilter = MagicFilterFactory.initFilters(mFilterType);
             mImageFilter.init();
             mSurfaceFilter = new MagicSurfaceInputFilter();
             mSurfaceFilter.init();
@@ -382,4 +384,16 @@ public class CameraThread extends Thread implements SurfaceTexture.OnFrameAvaila
         mSurfaceFilter.initSurfaceFrameBuffer(mCameraPreviewWidth, mCameraPreviewHeight);
     }
 
+    public void changeFilter(MagicFilterType type) {
+        mFilterType = type;
+        if(mImageFilter!=null){
+            mImageFilter.destroy();
+            mImageFilter = MagicFilterFactory.initFilters(type);
+            mImageFilter.init();
+            mImageFilter.onDisplaySizeChanged(mRenderWidth, mRenderHeight);
+            mImageFilter.onInputSizeChanged(mCameraPreviewWidth, mCameraPreviewHeight);
+        }
+
+
+    }
 }

@@ -4,6 +4,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import com.zxzx74147.mediacore.components.video.encoder.VideoEncoder;
+import com.zxzx74147.mediacore.components.video.filter.helper.MagicFilterType;
 import com.zxzx74147.mediacore.components.video.source.camera.CameraHandler;
 import com.zxzx74147.mediacore.components.video.source.camera.CameraThread;
 import com.zxzx74147.mediacore.components.video.source.camera.MainHandler;
@@ -19,6 +20,7 @@ public class VideoCameraSource implements IVideoSource {
     private SurfaceView mSurfaceView = null;
     private CameraThread mCameraThread = null;
     private VideoEncoder mVideoEncoder = null;
+    private MagicFilterType mMagicFilterType = null;
 
     @Override
     public void prepare() {
@@ -31,6 +33,7 @@ public class VideoCameraSource implements IVideoSource {
         mCameraThread.start();
         mCameraThread.waitUntilReady();
         setVideoEncoder(mVideoEncoder);
+        setFilter(mMagicFilterType);
     }
 
     @Override
@@ -39,7 +42,7 @@ public class VideoCameraSource implements IVideoSource {
             CameraHandler rh = mCameraThread.getHandler();
             rh.sendShutdown();
         }
-        if(mVideoEncoder!=null){
+        if (mVideoEncoder != null) {
             mVideoEncoder.drainVideoRawData(true);
         }
     }
@@ -93,6 +96,17 @@ public class VideoCameraSource implements IVideoSource {
         });
     }
 
+    public void setFilter(MagicFilterType type) {
+        if (type == null) {
+            return;
+        }
+        if (mCameraThread != null) {
+            CameraHandler rh = mCameraThread.getHandler();
+            rh.sendFilterChanged(type);
+        }
+        mMagicFilterType = type;
+
+    }
 
 
     private SurfaceHolder.Callback mSurfaceHolderCallback = new SurfaceHolder.Callback() {
