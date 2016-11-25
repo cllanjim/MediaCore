@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">MediaCoreDemo</string>
+    <string name="record">record</string>
+    <string name="done">done</string>
+</resources>
