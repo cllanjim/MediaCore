@@ -5,8 +5,6 @@ import android.media.MediaFormat;
 import android.media.MediaMuxer;
 import android.util.Log;
 
-import com.zxzx74147.mediacore.components.muxer.timestamp.TimeStampGenerator;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -102,9 +100,9 @@ public class Mp4Muxer {
 
         if ((info.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
             mVideoFinished = true;
-            if (info.presentationTimeUs == 0) {
-                info.presentationTimeUs = TimeStampGenerator.sharedInstance().getAudioStamp();
-            }
+//            if (info.presentationTimeUs == 0) {
+//                info.presentationTimeUs = TimeStampGenerator.sharedInstance().getAudioStamp();
+//            }
             Log.d(TAG, "video finish");
         }
         mMuxer.writeSampleData(mVideoTrackIndex, buffer, info);
@@ -135,9 +133,9 @@ public class Mp4Muxer {
 
         if ((info.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
             mAudioFinished = true;
-            if (info.presentationTimeUs == 0) {
-                info.presentationTimeUs = TimeStampGenerator.sharedInstance().getAudioStamp();
-            }
+//            if (info.presentationTimeUs == 0) {
+//                info.presentationTimeUs = TimeStampGenerator.sharedInstance().getAudioStamp();
+//            }
             Log.d(TAG, "audio finish");
         }
         mMuxer.writeSampleData(mAudioTrackIndex, buffer, info);
@@ -153,7 +151,7 @@ public class Mp4Muxer {
             try {
                 mMuxer.release();
             } catch (Exception e) {
-
+                e.printStackTrace();
             }
         }
 

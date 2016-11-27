@@ -161,7 +161,7 @@ public class AudioMediaSource implements IAudioSource {
                         // no output available yet
                         if (VERBOSE) Log.d(TAG, "no output from mVideoDecoder available");
                     } else if (decoderStatus == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
-                        // not important for us, since we're using Surface
+                        // not important for us, since we're using SurfaceØ
                         if (VERBOSE) Log.d(TAG, "mAudioDecoder output buffers changed");
                         mAudioDecoderOutputBuffers = mAudioDecoder.getOutputBuffers();
                     } else if (decoderStatus == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
