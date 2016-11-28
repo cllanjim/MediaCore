@@ -20,6 +20,10 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <meta-data android:value="YOUR_APP_KEY" android:name="583c145faed17921f5001c18"/>
+        <meta-data android:value="Channel ID" android:name="main"/>
+
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
