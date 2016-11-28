@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.Surface;
 
 import com.zxzx74147.mediacore.components.muxer.Mp4Muxer;
+import com.zxzx74147.mediacore.recorder.IProcessListener;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -25,6 +26,12 @@ public class VideoEncoder {
     private Mp4Muxer mMp4Muxer = null;
     private Surface mEncodesurface;
     private VideoMp4Config mConfig = new VideoMp4Config();
+    private IProcessListener mListener = null;
+
+    public void setProcessListener(IProcessListener listener) {
+        mListener = listener;
+    }
+
 
     public void prepare(VideoMp4Config config) {
         mConfig = config;
@@ -48,6 +55,7 @@ public class VideoEncoder {
             mEncodesurface = mVideoEncoder.createInputSurface();
             mVideoEncoder.start();
         } catch (IOException ioe) {
+
             throw new RuntimeException("failed init mVideoEncoder", ioe);
         }
 

@@ -11,6 +11,7 @@ import com.zxzx74147.mediacore.MediaCore;
 import com.zxzx74147.mediacore.components.video.encoder.VideoEncoder;
 import com.zxzx74147.mediacore.components.video.encoder.VideoMp4Config;
 import com.zxzx74147.mediacore.components.video.source.media.CodecOutputSurface;
+import com.zxzx74147.mediacore.recorder.IProcessListener;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,6 +37,7 @@ public class VideoMediaSource implements IVideoSource {
     private CodecOutputSurface outputSurface = null;
     private long mMeidaDuration = 0;
     private int decodeCount = 0;
+    private IProcessListener mListener = null;
 
     public VideoMediaSource(File mediaFile) {
         mFile = mediaFile;
@@ -121,6 +123,11 @@ public class VideoMediaSource implements IVideoSource {
     @Override
     public void setVideoEncoder(VideoEncoder videoEncoder) {
         mEncoder = videoEncoder;
+    }
+
+    @Override
+    public void setProcessListener(IProcessListener listener) {
+        mListener = listener;
     }
 
     public Runnable mExtractRunnable = new Runnable() {

@@ -45,6 +45,8 @@ public class MediaRecorder {
 
     public void setRecorderListener(IProcessListener listener){
         mRecorderListener = listener;
+        mAudioSource.setProcessListener(listener);
+        mVideoSource.setProcessListener(listener);
     }
 
     public void start() {

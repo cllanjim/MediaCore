@@ -3,6 +3,7 @@ package com.zxzx74147.mediacore.components.video.source;
 import android.view.SurfaceView;
 
 import com.zxzx74147.mediacore.components.video.encoder.VideoEncoder;
+import com.zxzx74147.mediacore.recorder.IProcessListener;
 
 import java.io.IOException;
 
@@ -24,4 +25,6 @@ public interface IVideoSource {
     void resume();
 
     void setVideoEncoder(VideoEncoder mVideoEncoder);
+
+    void setProcessListener(IProcessListener listener);
 }

@@ -33,6 +33,7 @@
             <Button
                 android:id="@+id/done"
                 android:text="@string/done"
+                android:background="@android:drawable/btn_dialog"
                 android:onClick="@{handler.onDone}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />

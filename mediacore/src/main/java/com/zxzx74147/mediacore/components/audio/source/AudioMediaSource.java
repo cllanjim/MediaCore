@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.zxzx74147.mediacore.MediaCore;
 import com.zxzx74147.mediacore.components.audio.encoder.AudioEncoder;
+import com.zxzx74147.mediacore.recorder.IProcessListener;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,6 +31,7 @@ public class AudioMediaSource implements IAudioSource {
     private Thread mExtractThread = null;
     private AudioEncoder mEncoder = null;
     private MediaCodec mAudioDecoder = null;
+    private IProcessListener mListener = null;
 
     public AudioMediaSource(File mediaFile) {
         mFile = mediaFile;
@@ -118,6 +120,11 @@ public class AudioMediaSource implements IAudioSource {
     @Override
     public void resume() {
 
+    }
+
+    @Override
+    public void setProcessListener(IProcessListener listener) {
+        mListener = listener;
     }
 
     private Runnable mExtractRunnable = new Runnable() {

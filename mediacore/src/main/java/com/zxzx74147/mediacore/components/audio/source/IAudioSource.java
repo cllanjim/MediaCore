@@ -1,6 +1,7 @@
 package com.zxzx74147.mediacore.components.audio.source;
 
 import com.zxzx74147.mediacore.components.audio.encoder.AudioEncoder;
+import com.zxzx74147.mediacore.recorder.IProcessListener;
 
 import java.io.IOException;
 
@@ -22,4 +23,6 @@ public interface IAudioSource {
     void pause();
 
     void resume();
+
+    void setProcessListener(IProcessListener listener);
 }

@@ -5,6 +5,7 @@ import android.media.MediaFormat;
 import android.util.Log;
 
 import com.zxzx74147.mediacore.components.muxer.Mp4Muxer;
+import com.zxzx74147.mediacore.recorder.IProcessListener;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -24,6 +25,9 @@ public class AudioEncoder {
     private Mp4Muxer mMp4Muxer = null;
     private long mLastTime = 0;
     private int bufferSize = 1024 * 16;
+    private IProcessListener mListener = null;
+
+
 
     public void prepare() {
         release();
@@ -46,6 +50,11 @@ public class AudioEncoder {
         }
 
     }
+
+    public void setProcessListener(IProcessListener listener) {
+        mListener = listener;
+    }
+
 
     public void setBufferSize(int bufferSize) {
         this.bufferSize = bufferSize;

@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.zxzx74147.mediacore.components.audio.encoder.AudioEncoder;
 import com.zxzx74147.mediacore.components.muxer.timestamp.TimeStampGenerator;
+import com.zxzx74147.mediacore.recorder.IProcessListener;
 
 import java.nio.ByteBuffer;
 
@@ -28,7 +29,7 @@ public class AudioMicSource implements IAudioSource {
     private volatile boolean mIsStop = false;
     private int mBufferSize = 0;
     private AudioEncoder mAudioEncoder = null;
-
+    private IProcessListener mListener = null;
 
     @Override
     public void prepare() {
@@ -40,7 +41,11 @@ public class AudioMicSource implements IAudioSource {
         }
         if (mByteBuffer == null) {
             mByteBuffer = ByteBuffer.allocate(mBufferSize * 2);
+            if(mAudioEncoder!=null){
+                mAudioEncoder.setBufferSize(mBufferSize*2);
+            }
         }
+
         mAudioRecord.startRecording();
     }
 
@@ -64,7 +69,7 @@ public class AudioMicSource implements IAudioSource {
     @Override
     public void setAudioEncoder(AudioEncoder encoder) {
         mAudioEncoder = encoder;
-        mAudioEncoder.setBufferSize(mBufferSize);
+
         mAudioEncoder.prepare();
         mAudioEncoder.start();
     }
@@ -78,6 +83,12 @@ public class AudioMicSource implements IAudioSource {
     public void resume() {
         mIsRecording = true;
     }
+
+    @Override
+    public void setProcessListener(IProcessListener listener) {
+        mListener = listener;
+    }
+
 
     private Runnable mRecordRunnable = new Runnable() {
         @Override

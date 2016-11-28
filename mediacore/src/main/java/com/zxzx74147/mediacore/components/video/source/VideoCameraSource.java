@@ -9,6 +9,7 @@ import com.zxzx74147.mediacore.components.video.filter.helper.MagicFilterType;
 import com.zxzx74147.mediacore.components.video.source.camera.CameraHandler;
 import com.zxzx74147.mediacore.components.video.source.camera.CameraThread;
 import com.zxzx74147.mediacore.components.video.source.camera.MainHandler;
+import com.zxzx74147.mediacore.recorder.IProcessListener;
 
 /**
  * Created by zhengxin on 2016/11/21.
@@ -22,6 +23,7 @@ public class VideoCameraSource implements IVideoSource {
     private CameraThread mCameraThread = null;
     private VideoEncoder mVideoEncoder = null;
     private MagicFilterType mMagicFilterType = null;
+    private IProcessListener mListener = null;
 
     @Override
     public void prepare() {
@@ -95,6 +97,11 @@ public class VideoCameraSource implements IVideoSource {
                         mVideoEncoder.getConfig().height);
             }
         });
+    }
+
+    @Override
+    public void setProcessListener(IProcessListener listener) {
+        mListener = listener;
     }
 
     public void setFilter(MagicFilterType type) {

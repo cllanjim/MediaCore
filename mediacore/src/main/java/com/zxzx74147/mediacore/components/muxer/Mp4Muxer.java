@@ -5,6 +5,8 @@ import android.media.MediaFormat;
 import android.media.MediaMuxer;
 import android.util.Log;
 
+import com.zxzx74147.mediacore.recorder.IProcessListener;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -26,12 +28,17 @@ public class Mp4Muxer {
     private volatile boolean mIsStarted = false;
     private Object mStartLock = new Object();
     private File mDstFile = null;
+    private IProcessListener mListener = null;
 
     public Mp4Muxer() {
     }
 
     public void setOutputFile(File file) {
         mDstFile = file;
+    }
+
+    public void setProcessListener(IProcessListener listener) {
+        mListener = listener;
     }
 
     public void init() {
