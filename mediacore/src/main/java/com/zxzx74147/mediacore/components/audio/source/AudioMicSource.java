@@ -5,6 +5,7 @@ import android.media.MediaCodec;
 import android.media.MediaRecorder;
 import android.util.Log;
 
+import com.zxzx74147.mediacore.ErrorDefine;
 import com.zxzx74147.mediacore.components.audio.encoder.AudioEncoder;
 import com.zxzx74147.mediacore.components.muxer.timestamp.TimeStampGenerator;
 import com.zxzx74147.mediacore.recorder.IProcessListener;
@@ -125,7 +126,9 @@ public class AudioMicSource implements IAudioSource {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-
+                if(mListener!=null){
+                    mListener.onError(ErrorDefine.ERROR_AUDIO_UNKNOWN,e.getMessage());
+                }
             } finally {
                 if (mAudioRecord != null) {
                     mAudioRecord.stop();

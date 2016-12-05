@@ -47,6 +47,7 @@ public class MediaRecorder {
         mRecorderListener = listener;
         mAudioSource.setProcessListener(listener);
         mVideoSource.setProcessListener(listener);
+        mMp4Muxer.setProcessListener(listener);
     }
 
     public void start() {

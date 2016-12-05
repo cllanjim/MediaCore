@@ -3,8 +3,10 @@ package com.zxzx74147.mediacore.components.muxer;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.media.MediaMuxer;
+import android.net.Uri;
 import android.util.Log;
 
+import com.zxzx74147.mediacore.ErrorDefine;
 import com.zxzx74147.mediacore.recorder.IProcessListener;
 
 import java.io.File;
@@ -107,9 +109,6 @@ public class Mp4Muxer {
 
         if ((info.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
             mVideoFinished = true;
-//            if (info.presentationTimeUs == 0) {
-//                info.presentationTimeUs = TimeStampGenerator.sharedInstance().getAudioStamp();
-//            }
             Log.d(TAG, "video finish");
         }
         mMuxer.writeSampleData(mVideoTrackIndex, buffer, info);
@@ -140,9 +139,6 @@ public class Mp4Muxer {
 
         if ((info.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
             mAudioFinished = true;
-//            if (info.presentationTimeUs == 0) {
-//                info.presentationTimeUs = TimeStampGenerator.sharedInstance().getAudioStamp();
-//            }
             Log.d(TAG, "audio finish");
         }
         mMuxer.writeSampleData(mAudioTrackIndex, buffer, info);
@@ -157,8 +153,14 @@ public class Mp4Muxer {
             mIsStarted = false;
             try {
                 mMuxer.release();
+                if(mListener!=null){
+                    mListener.onComplete(Uri.fromFile(mDstFile));
+                }
             } catch (Exception e) {
                 e.printStackTrace();
+                if(mListener!=null){
+                    mListener.onError(ErrorDefine.ERROR_MUXER_FINISH_ERROR,e.getMessage());
+                }
             }
         }
 
