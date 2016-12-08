@@ -4,6 +4,8 @@ import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.media.MediaMuxer;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import com.zxzx74147.mediacore.ErrorDefine;
@@ -31,8 +33,10 @@ public class Mp4Muxer {
     private Object mStartLock = new Object();
     private File mDstFile = null;
     private IProcessListener mListener = null;
+    private Handler mHandler = null;
 
     public Mp4Muxer() {
+        mHandler = new Handler(Looper.getMainLooper());
     }
 
     public void setOutputFile(File file) {
@@ -50,8 +54,18 @@ public class Mp4Muxer {
             }
             mDstFile.createNewFile();
             mMuxer = new MediaMuxer(mDstFile.getAbsolutePath(), MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             e.printStackTrace();
+            if (mListener != null) {
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mListener.onError(ErrorDefine.ERROR_MUXER_CREATE_FILE, e.getMessage());
+                    }
+                });
+
+            }
+            return;
         }
         mVideoTrackIndex = -1;
         mAudioTrackIndex = -1;
@@ -63,8 +77,8 @@ public class Mp4Muxer {
     public void addVideoTrack(MediaFormat format) {
         Log.d(TAG, "video start");
         mVideoTrackIndex = mMuxer.addTrack(format);
-        if(mVideoTrackIndex<0){
-            Log.e(TAG, "audio add error mVideoTrackIndex="+mVideoTrackIndex);
+        if (mVideoTrackIndex < 0) {
+            Log.e(TAG, "audio add error mVideoTrackIndex=" + mVideoTrackIndex);
         }
         checkStart();
     }
@@ -81,10 +95,10 @@ public class Mp4Muxer {
     }
 
     public void addAudioTrack(MediaFormat format) {
-        if(VERBOSE) Log.d(TAG, "audio start");
+        if (VERBOSE) Log.d(TAG, "audio start");
         mAudioTrackIndex = mMuxer.addTrack(format);
-        if(mAudioTrackIndex<0){
-            Log.e(TAG, "audio add error mAudioTrackIndex="+mAudioTrackIndex);
+        if (mAudioTrackIndex < 0) {
+            Log.e(TAG, "audio add error mAudioTrackIndex=" + mAudioTrackIndex);
         }
         checkStart();
     }
@@ -104,7 +118,8 @@ public class Mp4Muxer {
                 e.printStackTrace();
             }
         }
-        if (VERBOSE) Log.d(TAG, "writeVideo = " + info.size + "|timestamp=" + info.presentationTimeUs);
+        if (VERBOSE)
+            Log.d(TAG, "writeVideo = " + info.size + "|timestamp=" + info.presentationTimeUs);
 
 
         if ((info.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
@@ -114,6 +129,16 @@ public class Mp4Muxer {
         mMuxer.writeSampleData(mVideoTrackIndex, buffer, info);
         if (mVideoFinished && mAudioFinished) {
             finish();
+        }
+        final long timeUs = info.presentationTimeUs;
+        if (mListener != null) {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    mListener.onProgress((int) (timeUs / 1000));
+                }
+            });
+
         }
     }
 
@@ -135,7 +160,8 @@ public class Mp4Muxer {
                 e.printStackTrace();
             }
         }
-        if (VERBOSE) Log.d(TAG, "writeAudio = " + info.size + "|timestamp=" + info.presentationTimeUs);
+        if (VERBOSE)
+            Log.d(TAG, "writeAudio = " + info.size + "|timestamp=" + info.presentationTimeUs);
 
         if ((info.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
             mAudioFinished = true;
@@ -148,18 +174,28 @@ public class Mp4Muxer {
     }
 
     public void finish() {
-        Log.d(TAG, "finish");
+        if (VERBOSE) Log.d(TAG, "finish");
         if (mIsStarted) {
             mIsStarted = false;
             try {
                 mMuxer.release();
-                if(mListener!=null){
-                    mListener.onComplete(Uri.fromFile(mDstFile));
+                if (mListener != null) {
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mListener.onComplete(Uri.fromFile(mDstFile));
+                        }
+                    });
                 }
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 e.printStackTrace();
-                if(mListener!=null){
-                    mListener.onError(ErrorDefine.ERROR_MUXER_FINISH_ERROR,e.getMessage());
+                if (mListener != null) {
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mListener.onError(ErrorDefine.ERROR_MUXER_FINISH_ERROR, e.getMessage());
+                        }
+                    });
                 }
             }
         }

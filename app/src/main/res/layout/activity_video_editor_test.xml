@@ -8,16 +8,24 @@
             type="com.zxzx74147.mediacoredemo.test.VideoEditorTestActivity" />
     </data>
 
-    <RelativeLayout
+
+
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
         <Button
             android:id="@+id/select"
             android:text="@string/select"
             android:onClick="@{handler::onSelect}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
+        <com.zxzx74147.mediacore.player.FilterVideoView
+            android:id="@+id/video_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
-    </RelativeLayout>
+
+
+    </LinearLayout>
 </layout>

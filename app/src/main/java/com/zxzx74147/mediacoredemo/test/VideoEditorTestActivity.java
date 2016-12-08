@@ -28,6 +28,11 @@ public class VideoEditorTestActivity extends BaseActivity {
         mBindig = DataBindingUtil.setContentView(this, R.layout.activity_video_editor_test);
         mBindig.setHandler(this);
         mEditor = new MediaEditor();
+        IntentData intentData = getIntentData();
+        if(intentData!=null) {
+            mBindig.videoView.setVideoURI(intentData.uri);
+            mBindig.videoView.start();
+        }
     }
 
     public void onSelect(View v) {
@@ -37,8 +42,8 @@ public class VideoEditorTestActivity extends BaseActivity {
                 if (resultCode == Activity.RESULT_OK) {
                     IntentData intentData = new IntentData();
                     intentData.uri = data.getData();
-                    startEditor(data.getData());
-
+                    mBindig.videoView.setVideoURI(intentData.uri);
+                    mBindig.videoView.start();
                     return;
                 }
             }

@@ -3,4 +3,8 @@
     <string name="record">record</string>
     <string name="done">done</string>
     <string name="select">select a video</string>
+    <string name="edit_video">Video Editor</string>
+    <string name="filter">Filter</string>
+    <string name="add_music">Add Music</string>
+    <string name="record_video">Video Recorder</string>
 </resources>

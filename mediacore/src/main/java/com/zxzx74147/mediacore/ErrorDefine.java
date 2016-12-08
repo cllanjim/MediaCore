@@ -21,4 +21,5 @@ public class ErrorDefine {
     public static final int ERROR_MUXER_LOSE_TRACK = ERROR_MUXER + 1;
     public static final int ERROR_MUXER_STATUS_ERROR = ERROR_MUXER + 2;
     public static final int ERROR_MUXER_FINISH_ERROR = ERROR_MUXER + 3;
+    public static final int ERROR_MUXER_CREATE_FILE = ERROR_MUXER + 4;
 }

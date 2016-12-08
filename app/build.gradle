@@ -47,4 +47,6 @@ dependencies {
     compile 'com.github.hotchemi:permissionsdispatcher:2.2.0'
     annotationProcessor 'com.github.hotchemi:permissionsdispatcher-processor:2.2.0'
     compile 'com.umeng.analytics:analytics:latest.integration'
+    compile 'com.facebook.rebound:rebound:0.3.8'
+    compile 'com.tumblr:backboard:0.1.0'
 }
