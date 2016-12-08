@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="select">选取视频</string>
+	<string name="edit_video">视频编辑</string>
+	<string name="filter">滤镜</string>
+	<string name="add_music">添加音乐</string>
+	<string name="record_video">视频录制</string>
+</resources>
