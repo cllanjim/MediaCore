@@ -5,4 +5,5 @@
 	<string name="filter">滤镜</string>
 	<string name="add_music">添加音乐</string>
 	<string name="record_video">视频录制</string>
+	<string name="back">返回</string>
 </resources>

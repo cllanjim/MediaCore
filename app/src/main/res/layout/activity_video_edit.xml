@@ -2,6 +2,7 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
+
         <variable
             name="handler"
             type="com.zxzx74147.mediacoredemo.test.VideoEditorTestActivity" />
@@ -21,57 +22,34 @@
 
             <Button
                 android:id="@+id/back"
-                android:gravity="center"
                 android:layout_width="wrap_content"
-                android:textColor="@color/white"
-                android:drawableLeft="@drawable/md_nav_back"
                 android:layout_height="match_parent"
                 android:background="@null"
+                android:drawableLeft="@android:drawable/ic_menu_close_clear_cancel"
+                android:gravity="center"
                 android:onClick="@{() -> handler.finish()}"
-                android:text="@string/back" />
-
-            <Button
-                android:id="@+id/stop"
-                android:gravity="center"
-                android:layout_toRightOf="@+id/back"
-                android:layout_width="wrap_content"
-                android:textColor="@color/white"
-                android:drawableLeft="@drawable/md_nav_back"
-                android:layout_height="match_parent"
-                android:background="@null"
-                android:onClick="@{handler.onStop}"
-                android:text="STOP" />
-
+                android:text="@string/back"
+                android:textColor="@color/white" />
 
             <TextView
-                android:text="@string/edit_video"
-                android:textSize="@dimen/default_size_32"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:layout_width="wrap_content"
+                android:text="@string/edit_video"
                 android:textColor="@color/white"
-                android:layout_height="wrap_content" />
-            <Button
-                android:id="@+id/play"
-                android:gravity="center"
-                android:layout_width="wrap_content"
-                android:layout_toLeftOf="@+id/send"
-                android:textColor="@color/white"
-                android:drawableLeft="@drawable/md_nav_back"
-                android:layout_height="match_parent"
-                android:background="@null"
-                android:onClick="@{handler.onPlay}"
-                android:text="PLAY" />
+                android:textSize="@dimen/default_size_32" />
+
             <TextView
                 android:id="@+id/send"
                 android:layout_width="wrap_content"
-                android:textColor="@color/white"
-                android:gravity="center"
-                android:paddingRight="@dimen/default_gap_30"
-                android:layout_alignParentRight="true"
                 android:layout_height="match_parent"
-                android:onClick="@{handler.onDone}"
+                android:layout_alignParentRight="true"
                 android:background="@null"
-                android:text="@string/publish" />
+                android:gravity="center"
+                android:onClick="@{handler.onDone}"
+                android:paddingRight="@dimen/default_gap_30"
+                android:text="@string/publish"
+                android:textColor="@color/white" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -80,15 +58,8 @@
             android:layout_height="0dip"
             android:layout_weight="1">
 
-            <!--<com.devbrackets.android.exomedia.ui.widget.EMVideoView-->
-                <!--android:id="@+id/exo_player_view"-->
-                <!--android:layout_centerHorizontal="true"-->
-                <!--android:visibility="gone"-->
-                <!--android:layout_centerVertical="true"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="match_parent"/>-->
 
-            <cn.myhug.baobaoplayer.widget.BBFilterVideoView
+            <com.zxzx74147.mediacore.player.FilterVideoView
                 android:id="@+id/video_view"
                 android:layout_width="match_parent"
 
@@ -131,6 +102,15 @@
                     android:textSize="@dimen/default_size_28"
                     android:textStyle="bold" />
 
+                <TextView
+                    android:onClick="@{handler::onSelect}"
+                    android:text="@string/select"
+                    android:layout_marginLeft="@dimen/default_gap_30"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:textColor="@color/white"
+                    android:textSize="@dimen/default_size_28"
+                    android:textStyle="bold" />
+
                 <View
                     android:layout_width="0dip"
                     android:layout_height="1dip"
@@ -140,7 +120,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="@dimen/default_gap_30"
-                    android:drawableLeft="@drawable/icon_xiaosp_photo_music"
+                    android:drawableLeft="@drawable/music"
                     android:drawablePadding="@dimen/default_gap_10"
                     android:gravity="center"
 

@@ -7,4 +7,6 @@
     <string name="filter">Filter</string>
     <string name="add_music">Add Music</string>
     <string name="record_video">Video Recorder</string>
+    <string name="back">Back</string>
+    <string name="publish">Done</string>
 </resources>
