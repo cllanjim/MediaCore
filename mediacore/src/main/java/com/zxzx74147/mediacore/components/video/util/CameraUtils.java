@@ -165,9 +165,9 @@ public class CameraUtils {
 
     /**
      * Attempts to find a fixed preview frame rate that matches the desired frame rate.
-     * <p/>
+     *
      * It doesn't seem like there's a great deal of flexibility here.
-     * <p/>
+     *
      * TODO: follow the recipe from http://stackoverflow.com/questions/22639336/#22645327
      *
      * @return The expected frame rate, in thousands of frames per second.
