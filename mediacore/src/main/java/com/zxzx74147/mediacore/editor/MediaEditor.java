@@ -7,6 +7,8 @@ import com.zxzx74147.mediacore.components.audio.source.AudioSourceFactory;
 import com.zxzx74147.mediacore.components.audio.source.IAudioSource;
 import com.zxzx74147.mediacore.components.muxer.Mp4Muxer;
 import com.zxzx74147.mediacore.components.video.encoder.VideoEncoder;
+import com.zxzx74147.mediacore.components.video.filter.IChangeFilter;
+import com.zxzx74147.mediacore.components.video.filter.helper.MagicFilterType;
 import com.zxzx74147.mediacore.components.video.source.IVideoSource;
 import com.zxzx74147.mediacore.components.video.source.VideoSourceFactory;
 import com.zxzx74147.mediacore.recorder.IProcessListener;
@@ -18,7 +20,7 @@ import java.io.IOException;
  * Created by zhengxin on 2016/11/22.
  */
 
-public class MediaEditor {
+public class MediaEditor implements IChangeFilter {
     private static final String TAG = MediaEditor.class.getName();
     private boolean VERBOSE = false;
     private IAudioSource mAudioSource;
@@ -26,6 +28,7 @@ public class MediaEditor {
     private AudioEncoder mAudioEncoder;
     private VideoEncoder mVideoEncoder;
     private Mp4Muxer mMp4Muxer;
+    private MagicFilterType mFilterType = null;
 
     private File mInput = null;
     private Uri mInputUri = null;
@@ -56,16 +59,16 @@ public class MediaEditor {
     }
 
     public void prepare() throws IOException {
-        if ((mInput == null&&mInputUri==null) || mOuput == null) {
+        if ((mInput == null && mInputUri == null) || mOuput == null) {
             throw new IllegalArgumentException("media file is not exist" + (mInput != null ? mInput.toString() : ""));
         }
 //        if (!mInput.exists()) {
 //            throw new IllegalArgumentException("media file is not exist" + (mInput != null ? mInput.toString() : ""));
 //        }
-        if(mInput!=null) {
+        if (mInput != null) {
             mAudioSource = AudioSourceFactory.createMediaSource(mInput);
             mVideoSource = VideoSourceFactory.createMediaSource(mInput);
-        }else if(mInputUri !=null){
+        } else if (mInputUri != null) {
             mAudioSource = AudioSourceFactory.createMediaSource(mInputUri);
             mVideoSource = VideoSourceFactory.createMediaSource(mInputUri);
         }
@@ -84,7 +87,7 @@ public class MediaEditor {
 
         mVideoSource.prepare();
         mAudioSource.prepare();
-
+        setFilter(mFilterType);
 
     }
 
@@ -99,4 +102,12 @@ public class MediaEditor {
     }
 
 
+    @Override
+    public void setFilter(MagicFilterType type) {
+        if (mVideoSource != null && mVideoSource instanceof IChangeFilter) {
+            ((IChangeFilter) mVideoSource).setFilter(type);
+        }else{
+            mFilterType = type;
+        }
+    }
 }

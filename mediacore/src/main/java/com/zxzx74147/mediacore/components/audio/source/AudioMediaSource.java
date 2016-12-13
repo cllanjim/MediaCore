@@ -8,6 +8,8 @@ import android.util.Log;
 
 import com.zxzx74147.mediacore.MediaCore;
 import com.zxzx74147.mediacore.components.audio.encoder.AudioEncoder;
+import com.zxzx74147.mediacore.components.audio.encoder.AudioMp4Config;
+import com.zxzx74147.mediacore.components.audio.mixer.AudioNdkInterface;
 import com.zxzx74147.mediacore.recorder.IProcessListener;
 
 import java.io.File;
@@ -32,6 +34,9 @@ public class AudioMediaSource implements IAudioSource {
     private AudioEncoder mEncoder = null;
     private MediaCodec mAudioDecoder = null;
     private IProcessListener mListener = null;
+    private MediaFormat mOutputFormat = null;
+    private byte[] mInput = new byte[65535];
+    private byte[] mOutput = new byte[65535];
 
     public AudioMediaSource(File mediaFile) {
         mFile = mediaFile;
@@ -75,6 +80,7 @@ public class AudioMediaSource implements IAudioSource {
                 mAudioDecoder = MediaCodec.createDecoderByType(mime);
                 mAudioDecoder.configure(format, null, null, 0);
                 mAudioDecoder.start();
+                mOutputFormat = format;
                 break;
             }
         }
@@ -203,6 +209,13 @@ public class AudioMediaSource implements IAudioSource {
 //                                    mAudioByteBuffer.flip();
 //                                    mEncoder.drainAudioRawData(false, mAudioByteBuffer, info);
 //                                } else {
+
+                                int samplerate = mOutputFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE);
+                                int channel = mOutputFormat.getInteger(MediaFormat.KEY_CHANNEL_COUNT);
+                                mAudioDecoderOutputBuffers[decoderStatus].get(mInput,info.offset,info.size);
+                                int len = AudioNdkInterface.pcm_convert(mInput,info.size,samplerate,channel,mOutput, AudioMp4Config.OUTPUT_AUDIO_SAMPLE_RATE_HZ);
+//                                if(VERBOSE)
+                                    Log.i(TAG,String.format("input size =%d rate=%d,output size=%d rate=%d",info.size,samplerate,len, AudioMp4Config.OUTPUT_AUDIO_SAMPLE_RATE_HZ));
                                 mEncoder.drainAudioRawData(false, mAudioDecoderOutputBuffers[decoderStatus], info);
 //                                }
                             }

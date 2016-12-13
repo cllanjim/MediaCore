@@ -10,6 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
 import android.view.View;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.zxzx74147.mediacore.components.util.FileSelectUtil;
 import com.zxzx74147.mediacore.components.util.FileUtil;
 import com.zxzx74147.mediacore.components.video.filter.FilterConfig;
@@ -19,6 +20,7 @@ import com.zxzx74147.mediacore.components.video.filter.helper.MagicFilterFactory
 import com.zxzx74147.mediacore.components.video.filter.helper.MagicFilterType;
 import com.zxzx74147.mediacore.components.video.filter.widget.FilterTypeHelper;
 import com.zxzx74147.mediacore.editor.MediaEditor;
+import com.zxzx74147.mediacore.recorder.IProcessListener;
 import com.zxzx74147.mediacoredemo.R;
 import com.zxzx74147.mediacoredemo.base.BaseActivity;
 import com.zxzx74147.mediacoredemo.data.BaseItemData;
@@ -37,6 +39,8 @@ public class VideoEditorTestActivity extends BaseActivity {
     private ActivityVideoEditBinding mBinding = null;
     private MediaEditor mEditor = null;
     private FilterData mLastFilter = null;
+    private Uri mUri = null;
+    private MaterialDialog mProgressDialog = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,13 +53,33 @@ public class VideoEditorTestActivity extends BaseActivity {
         mEditor = new MediaEditor();
         IntentData intentData = getIntentData();
         if(intentData!=null) {
+            mUri = intentData.uri;
             mBinding.videoView.setVideoURI(intentData.uri);
             mBinding.videoView.start();
         }
     }
 
     public void onDone(View v){
-
+        if(mUri==null){
+            return;
+        }
+        mEditor.setInputMedia(mUri);
+        mEditor.setFilter(mLastFilter.mType);
+        mEditor.setOutputMedia(FileUtil.getFile("edit_" + System.currentTimeMillis() + ".mp4"));
+        try {
+            mEditor.prepare();
+            mEditor.start();
+            mEditor.setListener(mListener);
+            mProgressDialog = new MaterialDialog.Builder(this)
+                    .title("处理中")
+                    .content("请稍等")
+                    .progress(false, 100, true)
+                    .canceledOnTouchOutside(false)
+//                .cancelable(false)
+                    .show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void onSelect(View v) {
@@ -67,23 +91,37 @@ public class VideoEditorTestActivity extends BaseActivity {
                     intentData.uri = data.getData();
                     mBinding.videoView.setVideoURI(intentData.uri);
                     mBinding.videoView.start();
+                    mUri = intentData.uri;
                     return;
                 }
             }
         });
     }
 
-    public void startEditor(Uri uri) {
-        mEditor.setInputMedia(uri);
-        mEditor.setOutputMedia(FileUtil.getFile("edit_" + System.currentTimeMillis() + ".mp4"));
-        try {
-            mEditor.prepare();
-            mEditor.start();
-        } catch (IOException e) {
-            e.printStackTrace();
+    public IProcessListener mListener = new IProcessListener() {
+        @Override
+        public void onPreparedDone() {
+
         }
 
-    }
+        @Override
+        public void onError(int error, String errorStr) {
+            mProgressDialog.setContent(errorStr);
+        }
+
+        @Override
+        public void onProgress(int progress) {
+            if (mProgressDialog != null) {
+                mProgressDialog.setProgress(progress);
+            }
+        }
+
+        @Override
+        public void onComplete(Uri uri) {
+            mProgressDialog.dismiss();
+            mProgressDialog = null;
+        }
+    };
 
     private void initFilter() {
         mBinding.filterRecyclerview.setLayoutManager(new LinearLayoutManager(VideoEditorTestActivity.this, LinearLayoutManager.HORIZONTAL, false));

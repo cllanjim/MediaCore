@@ -29,6 +29,7 @@ public class AudioEncoder {
 
 
 
+
     public void prepare() {
         release();
 
@@ -156,6 +157,7 @@ public class AudioEncoder {
                             }
                             mLastTime = mBufferInfo.presentationTimeUs;
                         }
+
                         mMp4Muxer.writeAudio(encodedData, mBufferInfo);
                     }
                     if (VERBOSE) Log.d(TAG, "sent " + mBufferInfo.size + " audio bytes to muxer");

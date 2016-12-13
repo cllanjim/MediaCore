@@ -21,6 +21,7 @@
 
 
         <Button
+            android:id="@+id/record"
             android:layout_width="wrap_content"
             android:onClick="@{handler::onRecord}"
             android:text="@string/record_video"
