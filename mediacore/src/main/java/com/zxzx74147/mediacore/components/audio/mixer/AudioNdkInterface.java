@@ -6,11 +6,14 @@ package com.zxzx74147.mediacore.components.audio.mixer;
 
 public class AudioNdkInterface {
 
-    static  {
-        System.loadLibrary("audio_interface" );
+    static {
+        System.loadLibrary("audio_interface");
     }
 
     public static native int pcm_convert(byte[] pbyteInBuffer, int dwInLength, int dwInSampleRate,
-                                  int dwChannal, byte[] pbyteOutBuffer, int dwOutSampleRate);
+                                         int dwChannal, byte[] pbyteOutBuffer, int dwOutSampleRate);
+
+    public static native int mix(byte[] pbyteDest, int dwDestLen, int dwDestCap, byte[] pbyteOutBuffer, int dwSrcLen);
+
 
 }

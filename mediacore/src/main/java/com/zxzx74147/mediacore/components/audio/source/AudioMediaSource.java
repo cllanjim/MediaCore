@@ -24,6 +24,7 @@ import static com.zxzx74147.mediacore.components.util.TimeUtil.TIMEOUT_USEC;
 
 public class AudioMediaSource implements IAudioSource {
     private static final String TAG = AudioMediaSource.class.getName();
+    private static final int BUFFER_SIZE = 1024*128;
     private boolean VERBOSE = false;
 
     private MediaExtractor mExtractor = null;
@@ -35,8 +36,9 @@ public class AudioMediaSource implements IAudioSource {
     private MediaCodec mAudioDecoder = null;
     private IProcessListener mListener = null;
     private MediaFormat mOutputFormat = null;
-    private byte[] mInput = new byte[65535];
-    private byte[] mOutput = new byte[65535];
+    private byte[] mInput = new byte[BUFFER_SIZE];
+    private byte[] mOutput = new byte[BUFFER_SIZE];
+    private ByteBuffer mOutputByteBuffer =ByteBuffer.allocate(BUFFER_SIZE);
 
     public AudioMediaSource(File mediaFile) {
         mFile = mediaFile;
@@ -53,12 +55,12 @@ public class AudioMediaSource implements IAudioSource {
 
     public AudioMediaSource(Uri uri) {
         mUri = uri;
-        if (mUri == null ) {
+        if (mUri == null) {
             throw new IllegalArgumentException("media file is not exist" + (mUri != null ? mUri.toString() : ""));
         }
         mExtractor = new MediaExtractor();
         try {
-            mExtractor.setDataSource(MediaCore.getContext(),mUri,null);
+            mExtractor.setDataSource(MediaCore.getContext(), mUri, null);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -67,8 +69,8 @@ public class AudioMediaSource implements IAudioSource {
 
     @Override
     public void prepare() throws IOException {
-        if(mEncoder==null){
-            throw new IllegalArgumentException("audio encoder is null! " );
+        if (mEncoder == null) {
+            throw new IllegalArgumentException("audio encoder is null! ");
         }
         int numTracks = mExtractor.getTrackCount();
         for (int i = 0; i < numTracks; ++i) {
@@ -87,7 +89,7 @@ public class AudioMediaSource implements IAudioSource {
         if (mAudioTrack < 0) {
             throw new IllegalArgumentException("media file does not include audio track! " + (mFile != null ? mFile.toString() : ""));
         }
-        mEncoder.setBufferSize(1024*256);
+        mEncoder.setBufferSize(BUFFER_SIZE);
         mEncoder.prepare();
         mEncoder.start();
 
@@ -147,7 +149,7 @@ public class AudioMediaSource implements IAudioSource {
                     int inputIndex = mAudioDecoder.dequeueInputBuffer(TIMEOUT_USEC);
                     if (inputIndex < 0) {
                         if (VERBOSE) Log.i(TAG, "Audio decoder is not available!");
-                    }else {
+                    } else {
                         ByteBuffer buffer = mAudioDecoder.getInputBuffers()[inputIndex];
                         int state = mExtractor.readSampleData(buffer, 0);
                         if (state < 0) {
@@ -209,15 +211,21 @@ public class AudioMediaSource implements IAudioSource {
 //                                    mAudioByteBuffer.flip();
 //                                    mEncoder.drainAudioRawData(false, mAudioByteBuffer, info);
 //                                } else {
-
                                 int samplerate = mOutputFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE);
                                 int channel = mOutputFormat.getInteger(MediaFormat.KEY_CHANNEL_COUNT);
-                                mAudioDecoderOutputBuffers[decoderStatus].get(mInput,info.offset,info.size);
-                                int len = AudioNdkInterface.pcm_convert(mInput,info.size,samplerate,channel,mOutput, AudioMp4Config.OUTPUT_AUDIO_SAMPLE_RATE_HZ);
-//                                if(VERBOSE)
-                                    Log.i(TAG,String.format("input size =%d rate=%d,output size=%d rate=%d",info.size,samplerate,len, AudioMp4Config.OUTPUT_AUDIO_SAMPLE_RATE_HZ));
-                                mEncoder.drainAudioRawData(false, mAudioDecoderOutputBuffers[decoderStatus], info);
-//                                }
+                                if (AudioMp4Config.OUTPUT_AUDIO_SAMPLE_RATE_HZ == samplerate) {
+                                    mEncoder.drainAudioRawData(false, mAudioDecoderOutputBuffers[decoderStatus], info);
+                                } else {
+                                    mAudioDecoderOutputBuffers[decoderStatus].get(mInput, info.offset, info.size);
+                                    int len = AudioNdkInterface.pcm_convert(mInput, info.size, samplerate, channel, mOutput, AudioMp4Config.OUTPUT_AUDIO_SAMPLE_RATE_HZ);
+                                    if (VERBOSE)
+                                        Log.i(TAG, String.format("input size =%d rate=%d,output size=%d rate=%d", info.size, samplerate, len, AudioMp4Config.OUTPUT_AUDIO_SAMPLE_RATE_HZ));
+                                    info.size = len;
+                                    info.offset =0;
+                                    mOutputByteBuffer.clear();
+                                    mOutputByteBuffer.put(mOutput,0,len);
+                                    mEncoder.drainAudioRawData(false, mOutputByteBuffer, info);
+                                }
                             }
                         }
                         mAudioDecoder.releaseOutputBuffer(decoderStatus, false);

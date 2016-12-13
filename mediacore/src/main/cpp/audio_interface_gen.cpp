@@ -15,6 +15,14 @@ extern "C" {
 JNIEXPORT jint JNICALL Java_com_zxzx74147_mediacore_components_audio_mixer_AudioNdkInterface_pcm_1convert
   (JNIEnv *, jclass, jbyteArray, jint, jint, jint, jbyteArray, jint);
 
+/*
+ * Class:     com_zxzx74147_mediacore_components_audio_mixer_AudioNdkInterface
+ * Method:    mix
+ * Signature: ([BII[BI)I
+ */
+JNIEXPORT jint JNICALL Java_com_zxzx74147_mediacore_components_audio_mixer_AudioNdkInterface_mix
+  (JNIEnv *, jclass, jbyteArray, jint, jint, jbyteArray, jint);
+
 #ifdef __cplusplus
 }
 #endif

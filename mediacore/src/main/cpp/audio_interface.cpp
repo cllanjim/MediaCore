@@ -19,6 +19,8 @@ extern "C" {
 JNIEXPORT jint JNICALL Java_com_zxzx74147_mediacore_components_audio_mixer_AudioNdkInterface_pcm_1convert
         (JNIEnv *, jclass, jbyteArray, jint, jint, jint, jbyteArray, jint);
 
+JNIEXPORT jint JNICALL Java_com_zxzx74147_mediacore_components_audio_mixer_AudioNdkInterface_mix
+        (JNIEnv *, jclass, jbyteArray, jint, jint, jbyteArray, jint);
 
 #ifdef __cplusplus
 }
@@ -42,4 +44,18 @@ JNIEXPORT jint JNICALL Java_com_zxzx74147_mediacore_components_audio_mixer_Audio
 
 }
 
+JNIEXPORT jint JNICALL Java_com_zxzx74147_mediacore_components_audio_mixer_AudioNdkInterface_mix
+        (JNIEnv * env, jclass m_class, jbyteArray pbyteDest, jint dwDestLen, jint dwDestCap, jbyteArray pbyteSrc, jint dwSrcLen){
+    jboolean isCopy;
+    jbyte* dst = env->GetByteArrayElements(pbyteDest,&isCopy);
+    jbyte* src = env->GetByteArrayElements(pbyteSrc,&isCopy);
+    PcmProcess process;
+    unsigned int dst_len = dwDestLen;
+    unsigned int src_len = dwSrcLen;
+    int mix_len = process.mix((unsigned char *) dst, dst_len, dwDestCap, (const unsigned char *) src, src_len);
+
+    env->ReleaseByteArrayElements( pbyteDest, dst, 0);
+    env->ReleaseByteArrayElements( pbyteSrc, src, 0);
+    return mix_len;
+}
 #endif

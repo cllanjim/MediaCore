@@ -26,7 +26,7 @@ public:
 		unsigned char* pbyteOutBuffer,
 		unsigned int& dwOutLength	/*in, out*/
 		);
-	static bool mix(unsigned char* pbyteDest,
+	static int mix(unsigned char* pbyteDest,
 		unsigned int& dwDestLen/*in, out*/,
 		unsigned int dwDestCap,
 		const unsigned char* pbyteSrc,

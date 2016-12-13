@@ -70,7 +70,7 @@ PcmProcess::~PcmProcess()
 
 
 //assume bitrate = 16
-bool PcmProcess::mix( unsigned char* pbyteDest, unsigned int& dwDestLen/*in, out*/, unsigned int dwDestCap, const unsigned char* pbyteSrc, unsigned int dwSrcLen )
+int PcmProcess::mix( unsigned char* pbyteDest, unsigned int& dwDestLen/*in, out*/, unsigned int dwDestCap, const unsigned char* pbyteSrc, unsigned int dwSrcLen )
 {
 	assert(dwDestLen <= dwDestCap && dwSrcLen <= dwDestCap);
 	assert(!(dwDestLen % 2 || dwSrcLen % 2));
@@ -125,7 +125,7 @@ bool PcmProcess::mix( unsigned char* pbyteDest, unsigned int& dwDestLen/*in, out
 
 	dwDestLen = dwDestLen > dwSrcLen ? dwDestLen : dwSrcLen;
 
-	return true;
+	return mixLen;
 
 }
 

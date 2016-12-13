@@ -24,7 +24,7 @@ public class AudioEncoder {
     private Thread mEncoderThread = null;
     private Mp4Muxer mMp4Muxer = null;
     private long mLastTime = 0;
-    private int bufferSize = 1024 * 16;
+    private int bufferSize = 1024 * 128;
     private IProcessListener mListener = null;
 
 
