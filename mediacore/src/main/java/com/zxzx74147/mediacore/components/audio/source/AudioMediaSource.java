@@ -7,9 +7,9 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.zxzx74147.mediacore.MediaCore;
-import com.zxzx74147.mediacore.components.audio.encoder.AudioEncoder;
+import com.zxzx74147.mediacore.components.audio.data.AudioRawData;
 import com.zxzx74147.mediacore.components.audio.encoder.AudioMp4Config;
-import com.zxzx74147.mediacore.components.audio.mixer.AudioNdkInterface;
+import com.zxzx74147.mediacore.components.util.StateConfig;
 import com.zxzx74147.mediacore.recorder.IProcessListener;
 
 import java.io.File;
@@ -24,21 +24,32 @@ import static com.zxzx74147.mediacore.components.util.TimeUtil.TIMEOUT_USEC;
 
 public class AudioMediaSource implements IAudioSource {
     private static final String TAG = AudioMediaSource.class.getName();
-    private static final int BUFFER_SIZE = 1024*128;
+    private static final int BUFFER_SIZE = 1024 * 128;
     private boolean VERBOSE = false;
+
 
     private MediaExtractor mExtractor = null;
     private File mFile = null;
     private Uri mUri = null;
     private int mAudioTrack = -1;
     private Thread mExtractThread = null;
-    private AudioEncoder mEncoder = null;
+    private IAudioRawConsumer mEncoder = null;
     private MediaCodec mAudioDecoder = null;
     private IProcessListener mListener = null;
     private MediaFormat mOutputFormat = null;
-    private byte[] mInput = new byte[BUFFER_SIZE];
-    private byte[] mOutput = new byte[BUFFER_SIZE];
-    private ByteBuffer mOutputByteBuffer =ByteBuffer.allocate(BUFFER_SIZE);
+    private int mMode = StateConfig.PROCESS_MODE_UNKOWN;
+    private boolean mLoop = false;
+    private boolean mIsOver = false;
+//    private byte[] mInput = new byte[BUFFER_SIZE];
+//    private byte[] mOutput = new byte[BUFFER_SIZE];
+//    private ByteBuffer mOutputByteBuffer =ByteBuffer.allocate(BUFFER_SIZE);
+
+    private byte[] mOutputBuffer = new byte[BUFFER_SIZE];
+    private byte[] mResult = new byte[BUFFER_SIZE];
+    private MediaCodec.BufferInfo decodeInfo = new MediaCodec.BufferInfo();
+    private int mLeftLen = 0;
+    private AudioRawData mRawData = new AudioRawData();
+
 
     public AudioMediaSource(File mediaFile) {
         mFile = mediaFile;
@@ -69,9 +80,6 @@ public class AudioMediaSource implements IAudioSource {
 
     @Override
     public void prepare() throws IOException {
-        if (mEncoder == null) {
-            throw new IllegalArgumentException("audio encoder is null! ");
-        }
         int numTracks = mExtractor.getTrackCount();
         for (int i = 0; i < numTracks; ++i) {
             MediaFormat format = mExtractor.getTrackFormat(i);
@@ -89,10 +97,22 @@ public class AudioMediaSource implements IAudioSource {
         if (mAudioTrack < 0) {
             throw new IllegalArgumentException("media file does not include audio track! " + (mFile != null ? mFile.toString() : ""));
         }
-        mEncoder.setBufferSize(BUFFER_SIZE);
-        mEncoder.prepare();
-        mEncoder.start();
+        if (mEncoder != null) {
+            mEncoder.setBufferSize(BUFFER_SIZE);
+            mEncoder.prepare();
 
+        }
+
+    }
+
+    @Override
+    public MediaFormat getMediaFormat() {
+        return mOutputFormat;
+    }
+
+    @Override
+    public void setLoop(boolean loop) {
+        mLoop = loop;
     }
 
     @Override
@@ -100,6 +120,7 @@ public class AudioMediaSource implements IAudioSource {
         if (mEncoder == null) {
             throw new IllegalStateException("The audio encoder is null ! ");
         }
+        mEncoder.start();
         mExtractThread = new Thread(mExtractRunnable);
         mExtractThread.setName("Extract audio thread");
         mExtractThread.start();
@@ -107,7 +128,10 @@ public class AudioMediaSource implements IAudioSource {
 
     @Override
     public void stop() {
-
+        if (mExtractThread != null) {
+            mExtractThread.interrupt();
+        }
+        mExtractThread = null;
     }
 
     @Override
@@ -116,7 +140,7 @@ public class AudioMediaSource implements IAudioSource {
     }
 
     @Override
-    public void setAudioEncoder(AudioEncoder encoder) {
+    public void setAudioEncoder(IAudioRawConsumer encoder) {
         mEncoder = encoder;
     }
 
@@ -135,6 +159,8 @@ public class AudioMediaSource implements IAudioSource {
         mListener = listener;
     }
 
+
+    //Async mode
     private Runnable mExtractRunnable = new Runnable() {
         @Override
         public void run() {
@@ -159,8 +185,6 @@ public class AudioMediaSource implements IAudioSource {
                         } else {
                             int trackIndex = mExtractor.getSampleTrackIndex();
                             if (trackIndex == mAudioTrack) {
-
-
                                 long presentationTimeUs = mExtractor.getSampleTime();
                                 mAudioDecoder.queueInputBuffer(inputIndex, 0, state, presentationTimeUs, mExtractor.getSampleFlags());
                             }
@@ -201,7 +225,7 @@ public class AudioMediaSource implements IAudioSource {
 //                                    int length = mAudioDecoder.pumpAudioBuffer(info.size);
 //                                    if (VERBOSE)
 //                                        Log.d(TAG, String.format("decode mix audio len=%d,time=%d,audio len = %d time=%d ",
-//                                                length, mAudioDecoder.latest.presentationTimeUs,
+//                                                length, mAudioDecoder.decodeInfo.presentationTimeUs,
 //                                                info.size, info.presentationTimeUs));
 //                                    mAudioDecoderOutputBuffers[decoderStatus].get(mAudioBytes, 0, info.size);
 //                                    AudioUtil.mixVoice(mAudioBytes, mAudioDecoder.getResult(), Math.min(length, info.size));
@@ -216,15 +240,15 @@ public class AudioMediaSource implements IAudioSource {
                                 if (AudioMp4Config.OUTPUT_AUDIO_SAMPLE_RATE_HZ == samplerate) {
                                     mEncoder.drainAudioRawData(false, mAudioDecoderOutputBuffers[decoderStatus], info);
                                 } else {
-                                    mAudioDecoderOutputBuffers[decoderStatus].get(mInput, info.offset, info.size);
-                                    int len = AudioNdkInterface.pcm_convert(mInput, info.size, samplerate, channel, mOutput, AudioMp4Config.OUTPUT_AUDIO_SAMPLE_RATE_HZ);
-                                    if (VERBOSE)
-                                        Log.i(TAG, String.format("input size =%d rate=%d,output size=%d rate=%d", info.size, samplerate, len, AudioMp4Config.OUTPUT_AUDIO_SAMPLE_RATE_HZ));
-                                    info.size = len;
-                                    info.offset =0;
-                                    mOutputByteBuffer.clear();
-                                    mOutputByteBuffer.put(mOutput,0,len);
-                                    mEncoder.drainAudioRawData(false, mOutputByteBuffer, info);
+//                                    mAudioDecoderOutputBuffers[decoderStatus].get(mInput, info.offset, info.size);
+//                                    int len = AudioNdkInterface.pcm_convert(mInput, info.size, samplerate, channel, mOutput, AudioMp4Config.OUTPUT_AUDIO_SAMPLE_RATE_HZ);
+//                                    if (VERBOSE)
+//                                        Log.i(TAG, String.format("input size =%d rate=%d,output size=%d rate=%d", info.size, samplerate, len, AudioMp4Config.OUTPUT_AUDIO_SAMPLE_RATE_HZ));
+//                                    info.size = len;
+//                                    info.offset =0;
+//                                    mOutputByteBuffer.clear();
+//                                    mOutputByteBuffer.put(mOutput,0,len);
+//                                    mEncoder.drainAudioRawData(false, mOutputByteBuffer, info);
                                 }
                             }
                         }
@@ -234,11 +258,109 @@ public class AudioMediaSource implements IAudioSource {
 
             }
 
-            mExtractor.release();
-            mAudioDecoder.stop();
-            mAudioDecoder.release();
+            release();
         }
     };
+
+    public void release() {
+        mExtractor.release();
+        mAudioDecoder.stop();
+        mAudioDecoder.release();
+    }
+
+
+    @Override
+    public AudioRawData pumpAudioBuffer(int expectLength) {
+        int sum = 0;
+        int loopCount = 0;
+        while (sum < expectLength) {
+
+            int dstLen = expectLength - sum;
+            if (mLeftLen >= dstLen) {
+                System.arraycopy(mOutputBuffer, 0, mResult, sum, dstLen);
+                mLeftLen -= dstLen;
+                System.arraycopy(mOutputBuffer, dstLen, mOutputBuffer, 0, mLeftLen);
+                sum += dstLen;
+                continue;
+            } else if (mLeftLen > 0) {
+                System.arraycopy(mOutputBuffer, 0, mResult, sum, mLeftLen);
+                sum += mLeftLen;
+                mLeftLen = 0;
+            }
+
+            loopCount++;
+            if (loopCount > 64) {
+                if (VERBOSE) Log.d(TAG, "extractor fail");
+                mExtractor = null;
+                break;
+            }
+
+            int inputIndex = mAudioDecoder.dequeueInputBuffer(TIMEOUT_USEC);
+            int outputIndex = -1;
+            if (!mIsOver) {
+
+                if (inputIndex >= 0) {
+                    ByteBuffer buffer = mAudioDecoder.getInputBuffers()[inputIndex];
+                    int chunkSize = mExtractor.readSampleData(buffer, 0);
+                    if (chunkSize > 0) {
+                        long presentationTimeUs = mExtractor.getSampleTime();
+                        mAudioDecoder.queueInputBuffer(inputIndex, 0, chunkSize, presentationTimeUs, mExtractor.getSampleFlags());
+                        outputIndex = mAudioDecoder.dequeueOutputBuffer(decodeInfo, TIMEOUT_USEC);
+                    } else {
+                        if (mLoop) {
+                            mExtractor.seekTo(0, MediaExtractor.SEEK_TO_CLOSEST_SYNC);
+                        } else {
+                            mIsOver = true;
+                            mAudioDecoder.queueInputBuffer(inputIndex, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
+                        }
+                    }
+                    if (!mExtractor.advance()) {
+                        if (mLoop) {
+                            mExtractor.seekTo(0, MediaExtractor.SEEK_TO_CLOSEST_SYNC);
+                        } else {
+                            mIsOver = true;
+                        }
+                    }
+                } else {
+                    release();
+                    try {
+                        prepare();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            if (outputIndex == MediaCodec.INFO_TRY_AGAIN_LATER) {
+                // no output available yet
+                if (VERBOSE) Log.d(TAG, "no output from mAudioDecoder available");
+            } else if (outputIndex == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
+                // not important for us, since we're using Surface
+                if (VERBOSE) Log.d(TAG, "mAudioDecoder output buffers changed");
+            } else if (outputIndex == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
+                MediaFormat newFormat = mAudioDecoder.getOutputFormat();
+                if (VERBOSE) Log.d(TAG, "mAudioDecoder output format changed: " + newFormat);
+            } else if (outputIndex < 0) {
+
+            } else {
+                ByteBuffer decodeBuffer = mAudioDecoder.getOutputBuffers()[outputIndex];
+                decodeBuffer.get(mOutputBuffer, mLeftLen, decodeInfo.size);
+                mLeftLen += decodeInfo.size;
+                mAudioDecoder.releaseOutputBuffer(outputIndex, false);
+
+                mRawData.info.flags = decodeInfo.flags;
+                mRawData.info.presentationTimeUs = decodeInfo.presentationTimeUs;
+                if ((decodeInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
+                    if (!mLoop) {
+                        break;
+                    }
+                }
+            }
+        }
+        mRawData.data = mResult;
+        mRawData.info.size = sum;
+        return mRawData;
+    }
 
 
 }

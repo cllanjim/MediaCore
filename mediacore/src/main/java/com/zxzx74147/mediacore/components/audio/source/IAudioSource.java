@@ -1,6 +1,8 @@
 package com.zxzx74147.mediacore.components.audio.source;
 
-import com.zxzx74147.mediacore.components.audio.encoder.AudioEncoder;
+import android.media.MediaFormat;
+
+import com.zxzx74147.mediacore.components.audio.data.AudioRawData;
 import com.zxzx74147.mediacore.recorder.IProcessListener;
 
 import java.io.IOException;
@@ -18,11 +20,19 @@ public interface IAudioSource {
 
     int getBufferSize();
 
-    void setAudioEncoder(AudioEncoder encoder);
+    void setAudioEncoder(IAudioRawConsumer encoder);
 
     void pause();
 
     void resume();
 
     void setProcessListener(IProcessListener listener);
+
+    MediaFormat getMediaFormat();
+
+    void setLoop(boolean loop);
+
+    AudioRawData pumpAudioBuffer(int expectLength);
+
+
 }

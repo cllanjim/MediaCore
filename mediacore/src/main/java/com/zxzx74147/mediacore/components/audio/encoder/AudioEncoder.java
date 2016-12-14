@@ -4,6 +4,7 @@ import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.util.Log;
 
+import com.zxzx74147.mediacore.components.audio.source.IAudioRawConsumer;
 import com.zxzx74147.mediacore.components.muxer.Mp4Muxer;
 import com.zxzx74147.mediacore.recorder.IProcessListener;
 
@@ -17,7 +18,7 @@ import static com.zxzx74147.mediacore.components.util.TimeUtil.TIMEOUT_USEC;
  * Created by zhengxin on 2016/11/21.
  */
 
-public class AudioEncoder {
+public class AudioEncoder implements IAudioRawConsumer {
     private static final String TAG = AudioEncoder.class.getName();
     private boolean VERBOSE = false;
     private volatile MediaCodec mAudioEncoder = null;
@@ -29,7 +30,7 @@ public class AudioEncoder {
 
 
 
-
+    @Override
     public void prepare() {
         release();
 
@@ -52,15 +53,16 @@ public class AudioEncoder {
 
     }
 
+    @Override
     public void setProcessListener(IProcessListener listener) {
         mListener = listener;
     }
 
-
+    @Override
     public void setBufferSize(int bufferSize) {
         this.bufferSize = bufferSize;
     }
-
+    @Override
     public void release() {
         if (mAudioEncoder != null) {
             mAudioEncoder.stop();
@@ -68,7 +70,7 @@ public class AudioEncoder {
             mAudioEncoder = null;
         }
     }
-
+    @Override
     public void start() {
         if(mMp4Muxer==null){
             throw new IllegalStateException("Muxer is not set");
@@ -84,7 +86,7 @@ public class AudioEncoder {
     public void setMuxer(Mp4Muxer muxer) {
         mMp4Muxer = muxer;
     }
-
+    @Override
     public int drainAudioRawData(boolean endOfStream, ByteBuffer inputBuffer, MediaCodec.BufferInfo info) {
         int inputIndex = mAudioEncoder.dequeueInputBuffer(TIMEOUT_USEC);
         if (inputIndex >= 0) {

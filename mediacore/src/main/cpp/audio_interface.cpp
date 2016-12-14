@@ -49,9 +49,10 @@ JNIEXPORT jint JNICALL Java_com_zxzx74147_mediacore_components_audio_mixer_Audio
     jboolean isCopy;
     jbyte* dst = env->GetByteArrayElements(pbyteDest,&isCopy);
     jbyte* src = env->GetByteArrayElements(pbyteSrc,&isCopy);
-    PcmProcess process;
     unsigned int dst_len = dwDestLen;
     unsigned int src_len = dwSrcLen;
+
+    PcmProcess process;
     int mix_len = process.mix((unsigned char *) dst, dst_len, dwDestCap, (const unsigned char *) src, src_len);
 
     env->ReleaseByteArrayElements( pbyteDest, dst, 0);
