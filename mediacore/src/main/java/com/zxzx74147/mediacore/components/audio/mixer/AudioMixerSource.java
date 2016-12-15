@@ -92,6 +92,11 @@ public class AudioMixerSource implements IAudioSource {
     }
 
     @Override
+    public void release() {
+
+    }
+
+    @Override
     public void setProcessListener(IProcessListener listener) {
 
     }
@@ -109,6 +114,11 @@ public class AudioMixerSource implements IAudioSource {
     @Override
     public AudioRawData pumpAudioBuffer(int expectLength) {
         return null;
+    }
+
+    @Override
+    public void setExpectFormat(MediaFormat format) {
+
     }
 
     private Runnable mMixRunnable = new Runnable() {

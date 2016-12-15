@@ -4,6 +4,8 @@ import android.media.MediaCodec;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.SurfaceView;
 
@@ -27,6 +29,7 @@ public class VideoMediaSource implements IVideoSource {
     private static final String TAG = VideoMediaSource.class.getName();
     private boolean VERBOSE = false;
 
+    private Handler mHandler = null;
     private MediaExtractor mExtractor = null;
     private File mFile = null;
     private Uri mUri = null;
@@ -50,6 +53,7 @@ public class VideoMediaSource implements IVideoSource {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        mHandler = new Handler(Looper.getMainLooper());
     }
 
     public VideoMediaSource(Uri uri) {
@@ -63,6 +67,7 @@ public class VideoMediaSource implements IVideoSource {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        mHandler = new Handler(Looper.getMainLooper());
     }
 
     @Override
@@ -139,6 +144,15 @@ public class VideoMediaSource implements IVideoSource {
                         format.getInteger(MediaFormat.KEY_HEIGHT));
             }
             mMeidaDuration = format.getLong(MediaFormat.KEY_DURATION);
+            if(mListener!=null){
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mListener.onPreparedDone((int) mMeidaDuration);
+                    }
+                });
+
+            }
             int videoWidth = format.getInteger(MediaFormat.KEY_WIDTH);
             int videoHeight = format.getInteger(MediaFormat.KEY_HEIGHT);
             int rotation = 0;
@@ -238,6 +252,9 @@ public class VideoMediaSource implements IVideoSource {
                                 mEncoder.drainVideoRawData(false);
                                 outputSurface.swapBuffers();
                                 decodeCount++;
+                            }
+                            if(mListener!=null){
+                                mListener.onProgress((int) info.presentationTimeUs);
                             }
                         }
 

@@ -56,6 +56,21 @@ public class MediaEditor implements IChangeFilter {
 
     public void setListener(IProcessListener listener) {
         mListener = listener;
+        if(mAudioEncoder!=null){
+            mAudioEncoder.setProcessListener(mListener);
+        }
+        if(mVideoEncoder!=null){
+            mVideoEncoder.setProcessListener(mListener);
+        }
+        if(mAudioSource!=null){
+            mAudioSource.setProcessListener(mListener);
+        }
+        if(mVideoSource!=null){
+            mVideoSource.setProcessListener(mListener);
+        }
+        if(mMp4Muxer!=null){
+            mMp4Muxer.setProcessListener(mListener);
+        }
     }
 
     public void prepare() throws IOException {
@@ -85,9 +100,16 @@ public class MediaEditor implements IChangeFilter {
         mAudioSource.setAudioEncoder(mAudioEncoder);
         mVideoSource.setVideoEncoder(mVideoEncoder);
 
+//        MediaFormat expectFormat = new MediaFormat();
+//        expectFormat.setInteger(MediaFormat.KEY_SAMPLE_RATE,44100);
+//        expectFormat.setInteger(MediaFormat.KEY_CHANNEL_COUNT,2);
+//        mAudioSource.setExpectFormat(expectFormat);
+
         mVideoSource.prepare();
         mAudioSource.prepare();
         setFilter(mFilterType);
+
+
 
     }
 

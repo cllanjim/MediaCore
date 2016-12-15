@@ -8,7 +8,7 @@ import android.util.Log;
 
 import com.zxzx74147.mediacore.MediaCore;
 import com.zxzx74147.mediacore.components.audio.data.AudioRawData;
-import com.zxzx74147.mediacore.components.audio.encoder.AudioMp4Config;
+import com.zxzx74147.mediacore.components.audio.mixer.AudioNdkInterface;
 import com.zxzx74147.mediacore.components.util.StateConfig;
 import com.zxzx74147.mediacore.recorder.IProcessListener;
 
@@ -27,6 +27,7 @@ public class AudioMediaSource implements IAudioSource {
     private static final int BUFFER_SIZE = 1024 * 128;
     private boolean VERBOSE = false;
 
+    private int mMode = StateConfig.PROCESS_MODE_UNKOWN;
 
     private MediaExtractor mExtractor = null;
     private File mFile = null;
@@ -37,13 +38,15 @@ public class AudioMediaSource implements IAudioSource {
     private MediaCodec mAudioDecoder = null;
     private IProcessListener mListener = null;
     private MediaFormat mOutputFormat = null;
-    private int mMode = StateConfig.PROCESS_MODE_UNKOWN;
+    private MediaFormat mExpectFormat = null;
+    private MediaFormat mRawOutputFormat = null;
+
     private boolean mLoop = false;
     private boolean mIsOver = false;
-//    private byte[] mInput = new byte[BUFFER_SIZE];
-//    private byte[] mOutput = new byte[BUFFER_SIZE];
-//    private ByteBuffer mOutputByteBuffer =ByteBuffer.allocate(BUFFER_SIZE);
 
+    private ByteBuffer mOutputByteBuffer = ByteBuffer.allocate(BUFFER_SIZE);
+
+    private byte[] mInputBuffer = new byte[BUFFER_SIZE];
     private byte[] mOutputBuffer = new byte[BUFFER_SIZE];
     private byte[] mResult = new byte[BUFFER_SIZE];
     private MediaCodec.BufferInfo decodeInfo = new MediaCodec.BufferInfo();
@@ -90,7 +93,7 @@ public class AudioMediaSource implements IAudioSource {
                 mAudioDecoder = MediaCodec.createDecoderByType(mime);
                 mAudioDecoder.configure(format, null, null, 0);
                 mAudioDecoder.start();
-                mOutputFormat = format;
+                mergeFormat(format);
                 break;
             }
         }
@@ -99,6 +102,7 @@ public class AudioMediaSource implements IAudioSource {
         }
         if (mEncoder != null) {
             mEncoder.setBufferSize(BUFFER_SIZE);
+            mEncoder.setOutputFormat(mOutputFormat);
             mEncoder.prepare();
 
         }
@@ -159,6 +163,22 @@ public class AudioMediaSource implements IAudioSource {
         mListener = listener;
     }
 
+    public void setExpectFormat(MediaFormat format) {
+        mExpectFormat = format;
+    }
+
+    //TODO merge format
+    private void mergeFormat(MediaFormat format) {
+        mRawOutputFormat = format;
+        if (mExpectFormat != null) {
+            String mime = mRawOutputFormat.getString(MediaFormat.KEY_MIME);
+            int samplerate = mExpectFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE);
+            int channel = mExpectFormat.getInteger(MediaFormat.KEY_CHANNEL_COUNT);
+            mOutputFormat = MediaFormat.createAudioFormat(mime, samplerate, channel);
+        } else {
+            mOutputFormat = mRawOutputFormat;
+        }
+    }
 
     //Async mode
     private Runnable mExtractRunnable = new Runnable() {
@@ -194,8 +214,8 @@ public class AudioMediaSource implements IAudioSource {
                 }
 
                 if (!decoderDone) {
-                    MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
-                    int decoderStatus = mAudioDecoder.dequeueOutputBuffer(info, TIMEOUT_USEC);
+
+                    int decoderStatus = mAudioDecoder.dequeueOutputBuffer(decodeInfo, TIMEOUT_USEC);
                     if (decoderStatus == MediaCodec.INFO_TRY_AGAIN_LATER) {
                         // no output available yet
                         if (VERBOSE) Log.d(TAG, "no output from mVideoDecoder available");
@@ -205,6 +225,7 @@ public class AudioMediaSource implements IAudioSource {
                         mAudioDecoderOutputBuffers = mAudioDecoder.getOutputBuffers();
                     } else if (decoderStatus == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
                         MediaFormat newFormat = mAudioDecoder.getOutputFormat();
+                        mergeFormat(newFormat);
                         if (VERBOSE)
                             Log.d(TAG, "mAudioDecoder output format changed: " + newFormat);
                     } else if (decoderStatus < 0) {
@@ -212,43 +233,47 @@ public class AudioMediaSource implements IAudioSource {
                     } else { // decoderStatus >= 0
                         if (VERBOSE)
                             Log.d(TAG, "surface mAudioDecoder given buffer " + decoderStatus +
-                                    " (size=" + info.size + ")");
-                        if ((info.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
+                                    " (size=" + decodeInfo.size + ")");
+                        if ((decodeInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
                             if (VERBOSE) Log.d(TAG, "output EOS");
                             decoderDone = true;
-                            mEncoder.drainAudioRawData(true, null, info);
+                            mEncoder.drainAudioRawData(true, null, decodeInfo);
                         } else {
-                            if (info.size > 0) {
-                                mAudioDecoderOutputBuffers[decoderStatus].position(info.offset);
-                                mAudioDecoderOutputBuffers[decoderStatus].limit(info.offset + info.size);
+                            if (decodeInfo.size > 0) {
+                                mAudioDecoderOutputBuffers[decoderStatus].position(decodeInfo.offset);
+                                mAudioDecoderOutputBuffers[decoderStatus].limit(decodeInfo.offset + decodeInfo.size);
 //                                if (mAudioDecoder.hasSource()) {
 //                                    int length = mAudioDecoder.pumpAudioBuffer(info.size);
 //                                    if (VERBOSE)
 //                                        Log.d(TAG, String.format("decode mix audio len=%d,time=%d,audio len = %d time=%d ",
 //                                                length, mAudioDecoder.decodeInfo.presentationTimeUs,
-//                                                info.size, info.presentationTimeUs));
-//                                    mAudioDecoderOutputBuffers[decoderStatus].get(mAudioBytes, 0, info.size);
-//                                    AudioUtil.mixVoice(mAudioBytes, mAudioDecoder.getResult(), Math.min(length, info.size));
+//                                                decodeInfo.size, decodeInfo.presentationTimeUs));
+//                                    mAudioDecoderOutputBuffers[decoderStatus].get(mAudioBytes, 0, decodeInfo.size);
+//                                    AudioUtil.mixVoice(mAudioBytes, mAudioDecoder.getResult(), Math.min(length, decodeInfo.size));
 //                                    mAudioByteBuffer.position(0);
-//                                    info.offset = 0;
-//                                    mAudioByteBuffer.put(mAudioBytes, 0, info.size);
+//                                    decodeInfo.offset = 0;
+//                                    mAudioByteBuffer.put(mAudioBytes, 0, decodeInfo.size);
 //                                    mAudioByteBuffer.flip();
 //                                    mEncoder.drainAudioRawData(false, mAudioByteBuffer, info);
 //                                } else {
-                                int samplerate = mOutputFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE);
-                                int channel = mOutputFormat.getInteger(MediaFormat.KEY_CHANNEL_COUNT);
-                                if (AudioMp4Config.OUTPUT_AUDIO_SAMPLE_RATE_HZ == samplerate) {
-                                    mEncoder.drainAudioRawData(false, mAudioDecoderOutputBuffers[decoderStatus], info);
+                                int samplerate = mRawOutputFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE);
+                                int channel = mRawOutputFormat.getInteger(MediaFormat.KEY_CHANNEL_COUNT);
+                                int expectSamplerate = mOutputFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE);
+                                int expectChannel = mOutputFormat.getInteger(MediaFormat.KEY_CHANNEL_COUNT);
+                                //sample rate convert
+                                if (expectSamplerate == samplerate && expectChannel == channel) {
+                                    mEncoder.drainAudioRawData(false, mAudioDecoderOutputBuffers[decoderStatus], decodeInfo);
                                 } else {
-//                                    mAudioDecoderOutputBuffers[decoderStatus].get(mInput, info.offset, info.size);
-//                                    int len = AudioNdkInterface.pcm_convert(mInput, info.size, samplerate, channel, mOutput, AudioMp4Config.OUTPUT_AUDIO_SAMPLE_RATE_HZ);
-//                                    if (VERBOSE)
-//                                        Log.i(TAG, String.format("input size =%d rate=%d,output size=%d rate=%d", info.size, samplerate, len, AudioMp4Config.OUTPUT_AUDIO_SAMPLE_RATE_HZ));
-//                                    info.size = len;
-//                                    info.offset =0;
-//                                    mOutputByteBuffer.clear();
-//                                    mOutputByteBuffer.put(mOutput,0,len);
-//                                    mEncoder.drainAudioRawData(false, mOutputByteBuffer, info);
+                                    mAudioDecoderOutputBuffers[decoderStatus].get(mInputBuffer, decodeInfo.offset, decodeInfo.size);
+                                    int len = AudioNdkInterface.pcm_convert(mInputBuffer, decodeInfo.size, samplerate, channel, mOutputBuffer, expectSamplerate, expectChannel);
+                                    if (VERBOSE)
+                                        Log.i(TAG, String.format("input size =%d rate=%d,output size=%d rate=%d", decodeInfo.size, samplerate, len, expectSamplerate));
+                                    decodeInfo.size = len;
+                                    decodeInfo.offset = 0;
+                                    mOutputByteBuffer.clear();
+                                    mOutputByteBuffer.put(mOutputBuffer, 0, len);
+                                    mOutputByteBuffer.flip();
+                                    mEncoder.drainAudioRawData(false, mOutputByteBuffer, decodeInfo);
                                 }
                             }
                         }
@@ -344,10 +369,25 @@ public class AudioMediaSource implements IAudioSource {
 
             } else {
                 ByteBuffer decodeBuffer = mAudioDecoder.getOutputBuffers()[outputIndex];
-                decodeBuffer.get(mOutputBuffer, mLeftLen, decodeInfo.size);
-                mLeftLen += decodeInfo.size;
-                mAudioDecoder.releaseOutputBuffer(outputIndex, false);
 
+                int samplerate = mRawOutputFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE);
+                int channel = mRawOutputFormat.getInteger(MediaFormat.KEY_CHANNEL_COUNT);
+                int expectSamplerate =  mOutputFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE);
+                int expectChannel = mOutputFormat.getInteger(MediaFormat.KEY_CHANNEL_COUNT);
+                //sample rate convert
+                if (expectSamplerate == samplerate && expectChannel == channel) {
+                    decodeBuffer.get(mOutputBuffer, mLeftLen, decodeInfo.size);
+                } else {
+                    decodeBuffer.get(mInputBuffer, decodeInfo.offset, decodeInfo.size);
+                    int len = AudioNdkInterface.pcm_convert(mInputBuffer, decodeInfo.size, samplerate, channel, mOutputBuffer, expectSamplerate, expectChannel);
+                    if (VERBOSE)
+                        Log.i(TAG, String.format("input size =%d rate=%d,output size=%d rate=%d", decodeInfo.size, samplerate, len, expectSamplerate));
+                    decodeInfo.size = len;
+                    decodeInfo.offset = 0;
+                }
+                mLeftLen += decodeInfo.size;
+
+                mAudioDecoder.releaseOutputBuffer(outputIndex, false);
                 mRawData.info.flags = decodeInfo.flags;
                 mRawData.info.presentationTimeUs = decodeInfo.presentationTimeUs;
                 if ((decodeInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {

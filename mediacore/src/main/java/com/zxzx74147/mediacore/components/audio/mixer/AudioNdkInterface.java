@@ -11,7 +11,7 @@ public class AudioNdkInterface {
     }
 
     public static native int pcm_convert(byte[] pbyteInBuffer, int dwInLength, int dwInSampleRate,
-                                         int dwChannal, byte[] pbyteOutBuffer, int dwOutSampleRate);
+                                         int dwChannal, byte[] pbyteOutBuffer, int dwOutSampleRate,int dwDstChannel);
 
     public static native int mix(byte[] pbyteDest, int dwDestLen, int dwDestCap, byte[] pbyteOutBuffer, int dwSrcLen);
 

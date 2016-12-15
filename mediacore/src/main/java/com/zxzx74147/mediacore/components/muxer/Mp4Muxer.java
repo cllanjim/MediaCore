@@ -22,7 +22,7 @@ import java.nio.ByteBuffer;
 public class Mp4Muxer {
     private static final String TAG = Mp4Muxer.class.getName();
 
-    private final boolean VERBOSE = false;
+    private final boolean VERBOSE = true;
     private MediaMuxer mMuxer = null;
     public int mVideoTrackIndex = -1;
     private int mAudioTrackIndex = -1;
@@ -135,7 +135,7 @@ public class Mp4Muxer {
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    mListener.onProgress((int) (timeUs / 1000));
+                    mListener.onProgress((int) (timeUs));
                 }
             });
 

@@ -26,6 +26,8 @@ public interface IAudioSource {
 
     void resume();
 
+    void release();
+
     void setProcessListener(IProcessListener listener);
 
     MediaFormat getMediaFormat();
@@ -33,6 +35,8 @@ public interface IAudioSource {
     void setLoop(boolean loop);
 
     AudioRawData pumpAudioBuffer(int expectLength);
+
+     void setExpectFormat(MediaFormat format);
 
 
 }

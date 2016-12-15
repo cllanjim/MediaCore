@@ -144,11 +144,44 @@ bool PcmProcess::stereo_to_mono( const unsigned char* pbyteInBuffer, unsigned in
 	return true;
 }
 
+bool PcmProcess::mono_to_stereo( const unsigned char* pbyteInBuffer, unsigned int dwInLength, unsigned char* pbyteOutBuffer, unsigned int& dwOutLength /*in, out*/ )
+{
+	if(!pbyteInBuffer || !pbyteOutBuffer || dwOutLength < dwInLength * 2 )
+		return false;
+
+	for(int i = 0; i < dwInLength / 2; i++)
+	{
+		*(short*)(pbyteOutBuffer + 4 * i) = *(short*)(pbyteInBuffer + 2 * i);
+		*(short*)(pbyteOutBuffer + 4 * i+2) = *(short*)(pbyteInBuffer + 2 * i);
+	}
+
+	dwOutLength = dwInLength * 2;
+	return true;
+}
+
 //assume bitrate = 16
-bool PcmProcess::pcm_convert( const unsigned char* pbyteInBuffer, unsigned int dwInLength, unsigned int dwInSampleRate,  unsigned int dwChannal, unsigned char* pbyteOutBuffer, unsigned int& dwOutLength, /*in, out*/ unsigned int dwOutSampleRate )
+bool PcmProcess::pcm_convert( const unsigned char* pbyteInBuffer, unsigned int dwInLength, unsigned int dwInSampleRate,  unsigned int dwChannal,
+							  unsigned char* pbyteOutBuffer, unsigned int& dwOutLength, /*in, out*/ unsigned int dwOutSampleRate ,unsigned int dwOutChannal)
 {
 	if(!pbyteInBuffer || !pbyteOutBuffer)
 		return false;
+
+    //	mono & stereo convert
+	if(dwChannal==1 && dwOutChannal==2){
+		unsigned char* stereoBuffer = (unsigned char *) malloc(sizeof(unsigned char*) * dwInLength * 2);
+		unsigned int stereoLen = dwInLength*2;
+		mono_to_stereo(pbyteInBuffer,dwInLength,stereoBuffer,stereoLen);
+		pbyteInBuffer = stereoBuffer;
+		dwInLength = stereoLen;
+		dwChannal = dwOutChannal;
+	}else if(dwChannal==2 && dwOutChannal==1){
+		unsigned char* monoBuffer = (unsigned char *) malloc(sizeof(unsigned char*) * dwInLength /2);
+		unsigned int monoLen = dwInLength/2;
+        stereo_to_mono(pbyteInBuffer,dwInLength,monoBuffer,monoLen);
+		pbyteInBuffer = monoBuffer;
+		dwInLength = monoLen;
+		dwChannal = dwOutChannal;
+	}
 
 	assert(dwOutLength >= dwInLength * (float(dwOutSampleRate) / dwInSampleRate));
 
@@ -268,7 +301,7 @@ bool PcmRealTimeMixer::InputData( unsigned int ID, const unsigned char* pByInBuf
 			m_VecSrcInfo[ID].nSampleRate,
 			m_nChannal,
 			m_SourceBuffer, nOutLen,
-			m_SampleRate))
+			m_SampleRate,m_nChannal))
 		{
 			assert(false);
 			return false;

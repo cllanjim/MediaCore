@@ -8,7 +8,7 @@ import android.net.Uri;
 
 public interface IProcessListener {
 
-    void onPreparedDone();
+    void onPreparedDone(int max);
 
     void onError(int error,String errorStr);
 

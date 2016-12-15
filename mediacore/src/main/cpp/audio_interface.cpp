@@ -17,7 +17,7 @@ extern "C" {
  * Signature: ([BIIIBI)I
  */
 JNIEXPORT jint JNICALL Java_com_zxzx74147_mediacore_components_audio_mixer_AudioNdkInterface_pcm_1convert
-        (JNIEnv *, jclass, jbyteArray, jint, jint, jint, jbyteArray, jint);
+        (JNIEnv *, jclass, jbyteArray, jint, jint, jint, jbyteArray, jint, jint);
 
 JNIEXPORT jint JNICALL Java_com_zxzx74147_mediacore_components_audio_mixer_AudioNdkInterface_mix
         (JNIEnv *, jclass, jbyteArray, jint, jint, jbyteArray, jint);
@@ -28,14 +28,14 @@ JNIEXPORT jint JNICALL Java_com_zxzx74147_mediacore_components_audio_mixer_Audio
 
 JNIEXPORT jint JNICALL Java_com_zxzx74147_mediacore_components_audio_mixer_AudioNdkInterface_pcm_1convert
         (JNIEnv * env, jclass m_class, jbyteArray pbyteInBuffer, jint dwInLength, jint dwInSampleRate, jint dwChannal,
-         jbyteArray pbyteOutBuffer, jint dwOutSampleRate){
+         jbyteArray pbyteOutBuffer, jint dwOutSampleRate,jint dwOutChannel){
     jboolean isCopy;
     jbyte* input = env->GetByteArrayElements(pbyteInBuffer,&isCopy);
     jbyte* output = env->GetByteArrayElements(pbyteOutBuffer,&isCopy);
     unsigned int dstLen = env->GetArrayLength(pbyteOutBuffer);
     PcmProcess process;
     process.pcm_convert((const unsigned char *) input, dwInLength, dwInSampleRate, dwChannal,
-                        (unsigned char *) output, dstLen, dwOutSampleRate);
+                        (unsigned char *) output, dstLen, dwOutSampleRate,dwOutChannel);
 
     env->ReleaseByteArrayElements( pbyteInBuffer, input, 0);
     env->ReleaseByteArrayElements( pbyteOutBuffer, output, 0);

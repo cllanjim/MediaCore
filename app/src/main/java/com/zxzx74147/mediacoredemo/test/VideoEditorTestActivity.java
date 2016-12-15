@@ -100,8 +100,10 @@ public class VideoEditorTestActivity extends BaseActivity {
 
     public IProcessListener mListener = new IProcessListener() {
         @Override
-        public void onPreparedDone() {
-
+        public void onPreparedDone(int max) {
+            if (mProgressDialog != null) {
+                mProgressDialog.setMaxProgress(max);
+            }
         }
 
         @Override

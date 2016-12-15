@@ -27,30 +27,37 @@ public class AudioEncoder implements IAudioRawConsumer {
     private long mLastTime = 0;
     private int bufferSize = 1024 * 128;
     private IProcessListener mListener = null;
-
+    private MediaFormat mOutputFormat = null;
 
 
     @Override
     public void prepare() {
         release();
-
+        if (mOutputFormat == null) {
+            throw new IllegalStateException("mOutputFormat is unknown");
+        }
         try {
-            MediaFormat outputAudioFormat =
-                    MediaFormat.createAudioFormat(
-                            MIME_TYPE_AUDIO, AudioMp4Config.OUTPUT_AUDIO_SAMPLE_RATE_HZ,
-                            2);
-            outputAudioFormat.setInteger(MediaFormat.KEY_BIT_RATE, AudioMp4Config.OUTPUT_AUDIO_BIT_RATE);
-            outputAudioFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, AudioMp4Config.OUTPUT_AUDIO_AAC_PROFILE);
-            outputAudioFormat.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, bufferSize * 2);
 
+            int samplerate = mOutputFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE);
+            int channel = mOutputFormat.getInteger(MediaFormat.KEY_CHANNEL_COUNT);
+            mOutputFormat = MediaFormat.createAudioFormat(
+                    MIME_TYPE_AUDIO, samplerate, channel);
+
+            mOutputFormat.setInteger(MediaFormat.KEY_BIT_RATE, AudioMp4Config.OUTPUT_AUDIO_BIT_RATE);
+            mOutputFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, AudioMp4Config.OUTPUT_AUDIO_AAC_PROFILE);
+            mOutputFormat.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, bufferSize * 2);
             mAudioEncoder = MediaCodec.createEncoderByType(AudioMp4Config.MIME_TYPE_AUDIO);
-            mAudioEncoder.configure(outputAudioFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
+            mAudioEncoder.configure(mOutputFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
             mAudioEncoder.start();
 
         } catch (IOException ioe) {
             throw new RuntimeException("failed init mVideoEncoder", ioe);
         }
 
+    }
+
+    public void setOutputFormat(MediaFormat format) {
+        mOutputFormat = format;
     }
 
     @Override
@@ -62,6 +69,7 @@ public class AudioEncoder implements IAudioRawConsumer {
     public void setBufferSize(int bufferSize) {
         this.bufferSize = bufferSize;
     }
+
     @Override
     public void release() {
         if (mAudioEncoder != null) {
@@ -70,9 +78,10 @@ public class AudioEncoder implements IAudioRawConsumer {
             mAudioEncoder = null;
         }
     }
+
     @Override
     public void start() {
-        if(mMp4Muxer==null){
+        if (mMp4Muxer == null) {
             throw new IllegalStateException("Muxer is not set");
         }
         if (mEncoderThread != null) {
@@ -86,6 +95,7 @@ public class AudioEncoder implements IAudioRawConsumer {
     public void setMuxer(Mp4Muxer muxer) {
         mMp4Muxer = muxer;
     }
+
     @Override
     public int drainAudioRawData(boolean endOfStream, ByteBuffer inputBuffer, MediaCodec.BufferInfo info) {
         int inputIndex = mAudioEncoder.dequeueInputBuffer(TIMEOUT_USEC);

@@ -59,8 +59,7 @@ public class RecordTestActivity extends BaseActivity {
 
     private IProcessListener mRecordListener = new IProcessListener() {
         @Override
-        public void onPreparedDone() {
-
+        public void onPreparedDone(int max) {
         }
 
         @Override

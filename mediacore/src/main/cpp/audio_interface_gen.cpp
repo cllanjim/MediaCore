@@ -10,10 +10,10 @@ extern "C" {
 /*
  * Class:     com_zxzx74147_mediacore_components_audio_mixer_AudioNdkInterface
  * Method:    pcm_convert
- * Signature: ([BIII[BI)I
+ * Signature: ([BIII[BII)I
  */
 JNIEXPORT jint JNICALL Java_com_zxzx74147_mediacore_components_audio_mixer_AudioNdkInterface_pcm_1convert
-  (JNIEnv *, jclass, jbyteArray, jint, jint, jint, jbyteArray, jint);
+  (JNIEnv *, jclass, jbyteArray, jint, jint, jint, jbyteArray, jint, jint);
 
 /*
  * Class:     com_zxzx74147_mediacore_components_audio_mixer_AudioNdkInterface

@@ -1,6 +1,7 @@
 package com.zxzx74147.mediacore.components.audio.source;
 
 import android.media.MediaCodec;
+import android.media.MediaFormat;
 
 import com.zxzx74147.mediacore.recorder.IProcessListener;
 
@@ -16,13 +17,13 @@ public interface IAudioRawConsumer {
 
     void setProcessListener(IProcessListener listener);
 
-
     void setBufferSize(int bufferSize);
 
     void release();
 
     void start();
 
+    void setOutputFormat(MediaFormat format);
 
     int drainAudioRawData(boolean endOfStream, ByteBuffer inputBuffer, MediaCodec.BufferInfo info);
 }

@@ -26,6 +26,12 @@ public:
 		unsigned char* pbyteOutBuffer,
 		unsigned int& dwOutLength	/*in, out*/
 		);
+
+	bool mono_to_stereo( const unsigned char* pbyteInBuffer,
+						 unsigned int dwInLength,
+						 unsigned char* pbyteOutBuffer,
+						 unsigned int& dwOutLength /*in, out*/ );
+
 	static int mix(unsigned char* pbyteDest,
 		unsigned int& dwDestLen/*in, out*/,
 		unsigned int dwDestCap,
@@ -44,7 +50,8 @@ public:
 		unsigned int dwChannal,
 		unsigned char* pbyteOutBuffer,
 		unsigned int& dwOutLength,		/*in, out*/
-		unsigned int dwOutSampleRate);
+		unsigned int dwOutSampleRate,
+		unsigned int dwOutChannal);
 
 
 private:

@@ -1,5 +1,6 @@
 package com.zxzx74147.mediacore.components.audio.source;
 
+import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
@@ -8,6 +9,7 @@ import android.util.Log;
 
 import com.zxzx74147.mediacore.ErrorDefine;
 import com.zxzx74147.mediacore.components.audio.data.AudioRawData;
+import com.zxzx74147.mediacore.components.audio.encoder.AudioMp4Config;
 import com.zxzx74147.mediacore.components.muxer.timestamp.TimeStampGenerator;
 import com.zxzx74147.mediacore.recorder.IProcessListener;
 
@@ -32,10 +34,12 @@ public class AudioMicSource implements IAudioSource {
     private int mBufferSize = 0;
     private IAudioRawConsumer mAudioEncoder = null;
     private IProcessListener mListener = null;
+    private MediaFormat mOutputFormat = new MediaFormat();
 
     @Override
     public void prepare() {
         mBufferSize = AudioRecord.getMinBufferSize(mMicConfig.frequence, mMicConfig.channelConfig, mMicConfig.audioEncoding);
+        mOutputFormat = MediaFormat.createAudioFormat(AudioMp4Config.MIME_TYPE_AUDIO,mMicConfig.frequence, mMicConfig.channelConfig== AudioFormat.CHANNEL_IN_MONO? 1:2 );
         //实例化AudioRecord
         mAudioRecord = new AudioRecord(MediaRecorder.AudioSource.CAMCORDER, mMicConfig.frequence, mMicConfig.channelConfig, mMicConfig.audioEncoding, mBufferSize);
         if (mInputBuffer == null) {
@@ -71,7 +75,7 @@ public class AudioMicSource implements IAudioSource {
     @Override
     public void setAudioEncoder(IAudioRawConsumer encoder) {
         mAudioEncoder = encoder;
-
+        mAudioEncoder.setOutputFormat(mOutputFormat);
         mAudioEncoder.prepare();
         mAudioEncoder.start();
     }
@@ -84,6 +88,11 @@ public class AudioMicSource implements IAudioSource {
     @Override
     public void resume() {
         mIsRecording = true;
+    }
+
+    @Override
+    public void release() {
+
     }
 
     @Override
@@ -104,6 +113,11 @@ public class AudioMicSource implements IAudioSource {
     @Override
     public AudioRawData pumpAudioBuffer(int expectLength) {
         return null;
+    }
+
+    @Override
+    public void setExpectFormat(MediaFormat format) {
+
     }
 
 
