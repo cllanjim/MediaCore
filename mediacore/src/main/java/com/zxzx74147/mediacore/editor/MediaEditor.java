@@ -1,8 +1,10 @@
 package com.zxzx74147.mediacore.editor;
 
+import android.content.res.AssetFileDescriptor;
 import android.net.Uri;
 
 import com.zxzx74147.mediacore.components.audio.encoder.AudioEncoder;
+import com.zxzx74147.mediacore.components.audio.mixer.AudioMixerSource;
 import com.zxzx74147.mediacore.components.audio.source.AudioSourceFactory;
 import com.zxzx74147.mediacore.components.audio.source.IAudioSource;
 import com.zxzx74147.mediacore.components.muxer.Mp4Muxer;
@@ -32,6 +34,11 @@ public class MediaEditor implements IChangeFilter {
 
     private File mInput = null;
     private Uri mInputUri = null;
+    private File mMixInput = null;
+    private Uri mMixInputUri = null;
+    private AssetFileDescriptor mMixInputFileDescriptor = null;
+
+
     private File mOuput = null;
 
     private IProcessListener mListener = null;
@@ -47,7 +54,14 @@ public class MediaEditor implements IChangeFilter {
 
     public void setInputMedia(Uri input) {
         mInputUri = input;
+    }
 
+    public void setInputMixMedia(Uri input) {
+        mInputUri = input;
+    }
+
+    public void setInputMixFileDescriptor(AssetFileDescriptor fileDescriptor) {
+        mMixInputFileDescriptor = fileDescriptor;
     }
 
     public void setOutputMedia(File output) {
@@ -56,19 +70,19 @@ public class MediaEditor implements IChangeFilter {
 
     public void setListener(IProcessListener listener) {
         mListener = listener;
-        if(mAudioEncoder!=null){
+        if (mAudioEncoder != null) {
             mAudioEncoder.setProcessListener(mListener);
         }
-        if(mVideoEncoder!=null){
+        if (mVideoEncoder != null) {
             mVideoEncoder.setProcessListener(mListener);
         }
-        if(mAudioSource!=null){
+        if (mAudioSource != null) {
             mAudioSource.setProcessListener(mListener);
         }
-        if(mVideoSource!=null){
+        if (mVideoSource != null) {
             mVideoSource.setProcessListener(mListener);
         }
-        if(mMp4Muxer!=null){
+        if (mMp4Muxer != null) {
             mMp4Muxer.setProcessListener(mListener);
         }
     }
@@ -77,9 +91,7 @@ public class MediaEditor implements IChangeFilter {
         if ((mInput == null && mInputUri == null) || mOuput == null) {
             throw new IllegalArgumentException("media file is not exist" + (mInput != null ? mInput.toString() : ""));
         }
-//        if (!mInput.exists()) {
-//            throw new IllegalArgumentException("media file is not exist" + (mInput != null ? mInput.toString() : ""));
-//        }
+
         if (mInput != null) {
             mAudioSource = AudioSourceFactory.createMediaSource(mInput);
             mVideoSource = VideoSourceFactory.createMediaSource(mInput);
@@ -87,6 +99,22 @@ public class MediaEditor implements IChangeFilter {
             mAudioSource = AudioSourceFactory.createMediaSource(mInputUri);
             mVideoSource = VideoSourceFactory.createMediaSource(mInputUri);
         }
+
+        IAudioSource mMixSource = null;
+        if (mMixInput != null) {
+            mMixSource = AudioSourceFactory.createMediaSource(mInput);
+        } else if (mMixInputUri != null) {
+            mMixSource = AudioSourceFactory.createMediaSource(mInputUri);
+        }else if(mMixInputFileDescriptor!=null){
+            mMixSource = AudioSourceFactory.createMediaSource(mMixInputFileDescriptor);
+        }
+        if(mMixSource!=null){
+            AudioMixerSource temp = new AudioMixerSource();
+            temp.addAudioSource(mAudioSource);
+            temp.addAudioSource(mMixSource);
+            mAudioSource = temp;
+        }
+
 
         mAudioEncoder = new AudioEncoder();
         mVideoEncoder = new VideoEncoder();
@@ -100,15 +128,10 @@ public class MediaEditor implements IChangeFilter {
         mAudioSource.setAudioEncoder(mAudioEncoder);
         mVideoSource.setVideoEncoder(mVideoEncoder);
 
-//        MediaFormat expectFormat = new MediaFormat();
-//        expectFormat.setInteger(MediaFormat.KEY_SAMPLE_RATE,44100);
-//        expectFormat.setInteger(MediaFormat.KEY_CHANNEL_COUNT,2);
-//        mAudioSource.setExpectFormat(expectFormat);
 
         mVideoSource.prepare();
         mAudioSource.prepare();
         setFilter(mFilterType);
-
 
 
     }
@@ -128,7 +151,7 @@ public class MediaEditor implements IChangeFilter {
     public void setFilter(MagicFilterType type) {
         if (mVideoSource != null && mVideoSource instanceof IChangeFilter) {
             ((IChangeFilter) mVideoSource).setFilter(type);
-        }else{
+        } else {
             mFilterType = type;
         }
     }

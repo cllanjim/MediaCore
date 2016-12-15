@@ -2,6 +2,7 @@ package com.zxzx74147.mediacoredemo.test;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.AssetFileDescriptor;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
@@ -62,6 +63,12 @@ public class VideoEditorTestActivity extends BaseActivity {
     public void onDone(View v){
         if(mUri==null){
             return;
+        }
+        try {
+            AssetFileDescriptor music = getAssets().openFd("music/Twinkle.mp3");
+            mEditor.setInputMixFileDescriptor(music);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         mEditor.setInputMedia(mUri);
         mEditor.setFilter(mLastFilter.mType);

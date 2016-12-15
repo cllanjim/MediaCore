@@ -4,6 +4,7 @@ import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.util.Log;
 
+import com.zxzx74147.mediacore.ErrorDefine;
 import com.zxzx74147.mediacore.components.audio.source.IAudioRawConsumer;
 import com.zxzx74147.mediacore.components.muxer.Mp4Muxer;
 import com.zxzx74147.mediacore.recorder.IProcessListener;
@@ -51,6 +52,7 @@ public class AudioEncoder implements IAudioRawConsumer {
             mAudioEncoder.start();
 
         } catch (IOException ioe) {
+            mListener.error(ErrorDefine.ERROR_AUDIO_ENCODER_INIT_ERROR,ioe.getMessage());
             throw new RuntimeException("failed init mVideoEncoder", ioe);
         }
 

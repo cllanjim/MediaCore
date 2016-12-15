@@ -1,5 +1,6 @@
 package com.zxzx74147.mediacore.components.audio.source;
 
+import android.content.res.AssetFileDescriptor;
 import android.net.Uri;
 
 import java.io.File;
@@ -19,5 +20,9 @@ public class AudioSourceFactory {
 
     public static IAudioSource createMediaSource(Uri mediaUri){
         return new AudioMediaSource(mediaUri);
+    }
+
+    public static IAudioSource createMediaSource(AssetFileDescriptor mMixInputFileDescriptor) {
+        return new AudioMediaSource(mMixInputFileDescriptor);
     }
 }
