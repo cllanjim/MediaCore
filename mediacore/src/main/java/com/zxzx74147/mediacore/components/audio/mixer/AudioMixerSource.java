@@ -20,7 +20,7 @@ import java.util.List;
  */
 
 public class AudioMixerSource implements IAudioSource {
-    private boolean VERBOSE = true;
+    private boolean VERBOSE = false;
     private static final String TAG = AudioMixerSource.class.getName();
     private static final int FRAGMENT_LEN = 4096;
 

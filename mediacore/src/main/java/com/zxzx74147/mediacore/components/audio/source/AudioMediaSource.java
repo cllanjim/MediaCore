@@ -58,38 +58,29 @@ public class AudioMediaSource implements IAudioSource {
 
     public AudioMediaSource(File mediaFile) {
         mFile = mediaFile;
-        if (mFile == null || !mFile.exists()) {
-            throw new IllegalArgumentException("media file is not exist" + (mFile != null ? mFile.toString() : ""));
-        }
-        mExtractor = new MediaExtractor();
-        try {
-            mExtractor.setDataSource(mFile.getAbsolutePath());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        init();
     }
 
     public AudioMediaSource(Uri uri) {
         mUri = uri;
-        if (mUri == null) {
-            throw new IllegalArgumentException("media file is not exist" + (mUri != null ? mUri.toString() : ""));
-        }
-        mExtractor = new MediaExtractor();
-        try {
-            mExtractor.setDataSource(MediaCore.getContext(), mUri, null);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        init();
     }
 
     public AudioMediaSource(AssetFileDescriptor mixInputFileDescriptor) {
         mMixInputFileDescriptor = mixInputFileDescriptor;
-        if (mMixInputFileDescriptor == null) {
-            throw new IllegalArgumentException("media file is not exist" + (mMixInputFileDescriptor != null ? mMixInputFileDescriptor.toString() : ""));
-        }
+        init();
+    }
+
+    private void init() {
         mExtractor = new MediaExtractor();
         try {
-            mExtractor.setDataSource(mMixInputFileDescriptor.getFileDescriptor(), mMixInputFileDescriptor.getStartOffset(), mMixInputFileDescriptor.getLength());
+            if (mUri != null) {
+                mExtractor.setDataSource(MediaCore.getContext(), mUri, null);
+            } else if (mFile != null) {
+                mExtractor.setDataSource(mFile.getAbsolutePath());
+            } else if (mMixInputFileDescriptor != null) {
+                mExtractor.setDataSource(mMixInputFileDescriptor.getFileDescriptor(), mMixInputFileDescriptor.getStartOffset(), mMixInputFileDescriptor.getLength());
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -350,10 +341,10 @@ public class AudioMediaSource implements IAudioSource {
                     int chunkSize = mExtractor.readSampleData(buffer, 0);
                     if (chunkSize > 0) {
                         long presentationTimeUs = mExtractor.getSampleTime();
-                        mAudioDecoder.queueInputBuffer(inputIndex, 0, chunkSize, presentationTimeUs, mExtractor.getSampleFlags());
-
+                        int flags = mExtractor.getSampleFlags();
+                        mAudioDecoder.queueInputBuffer(inputIndex, 0, chunkSize, presentationTimeUs, flags);
                     } else {
-                        if (VERBOSE) Log.d(TAG, "chunkSize="+chunkSize);
+                        if (VERBOSE) Log.d(TAG, "chunkSize=" + chunkSize);
                         if (mLoop) {
                             mExtractor.seekTo(0, MediaExtractor.SEEK_TO_CLOSEST_SYNC);
                         } else {
@@ -370,7 +361,7 @@ public class AudioMediaSource implements IAudioSource {
                         }
                     }
                 } else {
-                    release();
+                    init();
                     try {
                         prepare();
                     } catch (Exception e) {
@@ -404,8 +395,8 @@ public class AudioMediaSource implements IAudioSource {
                 } else {
                     decodeBuffer.get(mInputBuffer, decodeInfo.offset, decodeInfo.size);
                     int len = AudioNdkInterface.pcm_convert(mInputBuffer, decodeInfo.size, samplerate, channel, mOutputBuffer, expectSamplerate, expectChannel);
-                    if (VERBOSE)
-                        Log.i(TAG, String.format("input size =%d rate=%d,output size=%d rate=%d", decodeInfo.size, samplerate, len, expectSamplerate));
+//                    if (VERBOSE)
+//                        Log.i(TAG, String.format("input size =%d rate=%d,output size=%d rate=%d", decodeInfo.size, samplerate, len, expectSamplerate));
                     decodeInfo.size = len;
                     decodeInfo.offset = 0;
                 }
@@ -413,7 +404,8 @@ public class AudioMediaSource implements IAudioSource {
 
                 mAudioDecoder.releaseOutputBuffer(outputIndex, false);
                 if (VERBOSE) {
-                    Log.i(TAG, "decode flag="+decodeInfo.flags);
+                    if (decodeInfo.flags != 0)
+                        Log.i(TAG, "decode flag=" + decodeInfo.flags);
                 }
                 mRawData.info.flags = decodeInfo.flags;
                 mRawData.info.presentationTimeUs = decodeInfo.presentationTimeUs;

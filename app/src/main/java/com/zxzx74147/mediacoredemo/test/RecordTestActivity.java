@@ -16,7 +16,7 @@ import com.zxzx74147.mediacoredemo.utils.ZXActivityJumpHelper;
 
 public class RecordTestActivity extends BaseActivity {
 
-    private static final int MAX_LEN = 1000*30;
+    private static final int MAX_LEN = 30*1000*1000;
     private MediaRecorder mMediaRecorder = null;
     private ActivityRecordTestBinding mBinging = null;
     private boolean mIsRecroding = false;

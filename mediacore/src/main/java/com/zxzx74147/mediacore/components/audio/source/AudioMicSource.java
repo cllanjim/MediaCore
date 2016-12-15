@@ -53,10 +53,17 @@ public class AudioMicSource implements IAudioSource {
         }
 
         mAudioRecord.startRecording();
+        if(mAudioEncoder!=null) {
+            mAudioEncoder.setOutputFormat(mOutputFormat);
+            mAudioEncoder.prepare();
+        }
     }
 
     @Override
     public void start() {
+        if(mAudioEncoder!=null) {
+            mAudioEncoder.start();
+        }
         mRecordThread = new Thread(mRecordRunnable);
         mRecordThread.setName("Record Thread");
         mRecordThread.start();
@@ -75,9 +82,8 @@ public class AudioMicSource implements IAudioSource {
     @Override
     public void setAudioEncoder(IAudioRawConsumer encoder) {
         mAudioEncoder = encoder;
-        mAudioEncoder.setOutputFormat(mOutputFormat);
-        mAudioEncoder.prepare();
-        mAudioEncoder.start();
+
+
     }
 
     @Override
