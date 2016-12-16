@@ -23,6 +23,7 @@ import static com.zxzx74147.mediacore.components.util.TimeUtil.TIMEOUT_USEC;
  * Created by zhengxin on 2016/11/21.
  */
 
+
 public class AudioMediaSource implements IAudioSource {
     private static final String TAG = AudioMediaSource.class.getName();
     private static final int BUFFER_SIZE = 1024 * 128;
@@ -248,20 +249,6 @@ public class AudioMediaSource implements IAudioSource {
                             if (decodeInfo.size > 0) {
                                 mAudioDecoderOutputBuffers[decoderStatus].position(decodeInfo.offset);
                                 mAudioDecoderOutputBuffers[decoderStatus].limit(decodeInfo.offset + decodeInfo.size);
-//                                if (mAudioDecoder.hasSource()) {
-//                                    int length = mAudioDecoder.pumpAudioBuffer(info.size);
-//                                    if (VERBOSE)
-//                                        Log.d(TAG, String.format("decode mix audio len=%d,time=%d,audio len = %d time=%d ",
-//                                                length, mAudioDecoder.decodeInfo.presentationTimeUs,
-//                                                decodeInfo.size, decodeInfo.presentationTimeUs));
-//                                    mAudioDecoderOutputBuffers[decoderStatus].get(mAudioBytes, 0, decodeInfo.size);
-//                                    AudioUtil.mixVoice(mAudioBytes, mAudioDecoder.getResult(), Math.min(length, decodeInfo.size));
-//                                    mAudioByteBuffer.position(0);
-//                                    decodeInfo.offset = 0;
-//                                    mAudioByteBuffer.put(mAudioBytes, 0, decodeInfo.size);
-//                                    mAudioByteBuffer.flip();
-//                                    mEncoder.drainAudioRawData(false, mAudioByteBuffer, info);
-//                                } else {
                                 int samplerate = mRawOutputFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE);
                                 int channel = mRawOutputFormat.getInteger(MediaFormat.KEY_CHANNEL_COUNT);
                                 int expectSamplerate = mOutputFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE);

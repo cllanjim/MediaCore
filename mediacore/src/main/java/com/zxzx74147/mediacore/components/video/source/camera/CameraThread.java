@@ -47,11 +47,12 @@ public class CameraThread extends Thread implements SurfaceTexture.OnFrameAvaila
     private EglCore mEglCore;
     private WindowSurface mRenderWindowSurface;
     private int mRenderWidth, mRenderHeight;
+    private int mRenderWindowWidth, mRenderWindowHeight;
 
     private WindowSurface mCodecWindowSurface;
     private int mCodecWidth, mCodecHeight;
 
-    private int textureId;
+    private int textureId = OpenGlUtils.NO_TEXTURE;
 
     private GPUImageFilter mImageFilter;
     private MagicSurfaceInputFilter mSurfaceFilter = null;
@@ -149,7 +150,7 @@ public class CameraThread extends Thread implements SurfaceTexture.OnFrameAvaila
 
         CameraUtils.choosePreviewSize(parms, desiredWidth, desiredHeight);
 
-        int thousandFps = CameraUtils.chooseFixedPreviewFps(parms, desiredFps * 1000);
+        CameraUtils.chooseFixedPreviewFps(parms, desiredFps * 1000);
         parms.setRecordingHint(true);
         CameraUtils.chooseAudoFocus(parms);
         mCamera.setParameters(parms);
@@ -189,11 +190,11 @@ public class CameraThread extends Thread implements SurfaceTexture.OnFrameAvaila
         }
     }
 
-    public void resumeRecord(){
+    public void resumeRecord() {
         mIsRcording = true;
     }
 
-    public void pauseRecord(){
+    public void pauseRecord() {
         mIsRcording = false;
     }
 
@@ -209,6 +210,7 @@ public class CameraThread extends Thread implements SurfaceTexture.OnFrameAvaila
 
 
     public void renderSurfaceAvailable(Surface surface) {
+
         if (mRenderWindowSurface == null) {
             try {
                 mRenderWindowSurface = new WindowSurface(mEglCore, surface, false);
@@ -228,8 +230,10 @@ public class CameraThread extends Thread implements SurfaceTexture.OnFrameAvaila
             textureId = OpenGlUtils.getExternalOESTextureID();
             mCameraTexture = new SurfaceTexture(textureId);
 
-            mRenderWidth = mRenderWindowSurface.getWidth();
-            mRenderHeight = mRenderWindowSurface.getHeight();
+            mRenderWindowWidth = mRenderWindowSurface.getWidth();
+            mRenderWindowHeight = mRenderWindowSurface.getHeight();
+            mRenderWidth = mRenderWindowWidth;
+            mRenderHeight = mRenderWindowHeight;
             mCameraTexture.setOnFrameAvailableListener(this);
 
             mImageFilter = MagicFilterFactory.initFilters(mFilterType);
@@ -246,8 +250,8 @@ public class CameraThread extends Thread implements SurfaceTexture.OnFrameAvaila
     }
 
     public void renderSurfaceChanged(int width, int height) {
-        mRenderWidth = width;
-        mRenderHeight = height;
+        mRenderWindowWidth = width;
+        mRenderWindowHeight = height;
         updateGeometry();
     }
 
@@ -309,6 +313,9 @@ public class CameraThread extends Thread implements SurfaceTexture.OnFrameAvaila
             mCameraTexture.release();
             mCameraTexture = null;
         }
+        if (textureId != OpenGlUtils.NO_TEXTURE) {
+            //TODO
+        }
         GlUtil.checkGlError("releaseGl done");
         mEglCore.makeNothingCurrent();
         mEglCore.release();
@@ -337,12 +344,12 @@ public class CameraThread extends Thread implements SurfaceTexture.OnFrameAvaila
 
         if (mRenderWindowSurface != null) {
             mRenderWindowSurface.makeCurrent();
-            GLES20.glViewport(0, 0, mRenderWidth, mRenderHeight);
+            GLES20.glViewport(0, mRenderWindowHeight-mRenderHeight, mRenderWidth, mRenderHeight);
             mImageFilter.onDrawFrame(id, mGLCubeBuffer, mGLTextureBuffer);
             mRenderWindowSurface.swapBuffers();
         }
 
-        if (mCodecWindowSurface != null&& mIsRcording) {
+        if (mCodecWindowSurface != null && mIsRcording) {
             mCodecWindowSurface.makeCurrent();
             GLES20.glViewport(0, 0, mCodecWidth, mCodecHeight);
             mImageFilter.onDrawFrame(id, mGLCubeBuffer, mGLTextureBuffer);
@@ -371,8 +378,8 @@ public class CameraThread extends Thread implements SurfaceTexture.OnFrameAvaila
         if (mImageFilter == null) {
             return;
         }
-        mRenderHeight = mRenderWidth * mCameraPreviewHeight / mCameraPreviewWidth;
-
+        mRenderHeight = mRenderWindowWidth * mCameraPreviewHeight / mCameraPreviewWidth;
+        mRenderWidth = mRenderWindowWidth;
         mImageFilter.onDisplaySizeChanged(mRenderWidth, mRenderHeight);
         mImageFilter.onInputSizeChanged(mCameraPreviewWidth, mCameraPreviewHeight);
 
@@ -386,7 +393,7 @@ public class CameraThread extends Thread implements SurfaceTexture.OnFrameAvaila
 
     public void changeFilter(MagicFilterType type) {
         mFilterType = type;
-        if(mImageFilter!=null){
+        if (mImageFilter != null) {
             mImageFilter.destroy();
             mImageFilter = MagicFilterFactory.initFilters(type);
             mImageFilter.init();

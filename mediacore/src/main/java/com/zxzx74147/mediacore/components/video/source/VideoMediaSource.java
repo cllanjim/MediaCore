@@ -12,6 +12,8 @@ import android.view.SurfaceView;
 import com.zxzx74147.mediacore.MediaCore;
 import com.zxzx74147.mediacore.components.video.encoder.VideoEncoder;
 import com.zxzx74147.mediacore.components.video.encoder.VideoMp4Config;
+import com.zxzx74147.mediacore.components.video.filter.IChangeFilter;
+import com.zxzx74147.mediacore.components.video.filter.helper.MagicFilterType;
 import com.zxzx74147.mediacore.components.video.source.media.CodecOutputSurface;
 import com.zxzx74147.mediacore.recorder.IProcessListener;
 
@@ -25,7 +27,7 @@ import static com.zxzx74147.mediacore.components.util.TimeUtil.TIMEOUT_USEC;
  * Created by zhengxin on 2016/11/21.
  */
 
-public class VideoMediaSource implements IVideoSource {
+public class VideoMediaSource implements IVideoSource ,IChangeFilter{
     private static final String TAG = VideoMediaSource.class.getName();
     private boolean VERBOSE = false;
 
@@ -41,6 +43,7 @@ public class VideoMediaSource implements IVideoSource {
     private long mMeidaDuration = 0;
     private int decodeCount = 0;
     private IProcessListener mListener = null;
+    private MagicFilterType mFilterType = null;
 
     public VideoMediaSource(File mediaFile) {
         mFile = mediaFile;
@@ -145,13 +148,7 @@ public class VideoMediaSource implements IVideoSource {
             }
             mMeidaDuration = format.getLong(MediaFormat.KEY_DURATION);
             if(mListener!=null){
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mListener.onPreparedDone((int) mMeidaDuration);
-                    }
-                });
-
+                  mListener.preparedDone((int) mMeidaDuration);
             }
             int videoWidth = format.getInteger(MediaFormat.KEY_WIDTH);
             int videoHeight = format.getInteger(MediaFormat.KEY_HEIGHT);
@@ -171,8 +168,8 @@ public class VideoMediaSource implements IVideoSource {
             config.height = videoHeight;
             mEncoder.prepare(config);
             outputSurface = new CodecOutputSurface(config.width, config.height, mEncoder.getEncoderSurface());
+            setFilter(mFilterType);
             mEncoder.start();
-            outputSurface.setFilter(null);
             outputSurface.setVideoWH(videoWidth, videoHeight);
 
             String mime = format.getString(MediaFormat.KEY_MIME);
@@ -254,7 +251,7 @@ public class VideoMediaSource implements IVideoSource {
                                 decodeCount++;
                             }
                             if(mListener!=null){
-                                mListener.onProgress((int) info.presentationTimeUs);
+                                mListener.progress((int) info.presentationTimeUs);
                             }
                         }
 
@@ -265,4 +262,11 @@ public class VideoMediaSource implements IVideoSource {
         }
     };
 
+    @Override
+    public void setFilter(MagicFilterType type) {
+        mFilterType = type;
+        if(outputSurface!=null) {
+            outputSurface.setFilter(mFilterType);
+        }
+    }
 }

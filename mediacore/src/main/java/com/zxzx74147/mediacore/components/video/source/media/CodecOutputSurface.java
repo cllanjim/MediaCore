@@ -12,6 +12,7 @@ import android.opengl.GLES20;
 import android.util.Log;
 import android.view.Surface;
 
+import com.zxzx74147.mediacore.components.video.filter.IChangeFilter;
 import com.zxzx74147.mediacore.components.video.filter.base.MagicSurfaceInputFilter;
 import com.zxzx74147.mediacore.components.video.filter.base.gpuimage.GPUImageFilter;
 import com.zxzx74147.mediacore.components.video.filter.helper.MagicFilterFactory;
@@ -29,7 +30,7 @@ import java.nio.FloatBuffer;
  * Created by guoheng-iri on 2016/9/1.
  */
 public class CodecOutputSurface
-        implements SurfaceTexture.OnFrameAvailableListener {
+        implements SurfaceTexture.OnFrameAvailableListener, IChangeFilter {
 
     private static final String TAG = "MediaMixer";
     private static final boolean VERBOSE = false;           // lots of logging
@@ -109,14 +110,6 @@ public class CodecOutputSurface
         mSurfaceTexture.setOnFrameAvailableListener(this);
 
         mSurface = new Surface(mSurfaceTexture);
-    }
-
-    public void setFilter(GPUImageFilter filter) {
-        if (filter == null) {
-            filter = MagicFilterFactory.initFilters(MagicFilterType.NONE);
-        }
-        mImageFilter = filter;
-        mImageFilter.init();
     }
 
     /**
@@ -347,7 +340,7 @@ public class CodecOutputSurface
         } else {
             int id = mSurfaceInputFilter.onDrawToTexture(mTextureId);
 
-            GLES20.glViewport(mVideoXOffset,mVideoYOffset   ,mVideoWidth,mVideoHeight);
+            GLES20.glViewport(mVideoXOffset, mVideoYOffset, mVideoWidth, mVideoHeight);
             mImageFilter.onDrawFrame(id, mGLCubeBuffer, mGLTextureBuffer);
         }
     }
@@ -381,8 +374,8 @@ public class CodecOutputSurface
         int height = (int) (videoHeight * scale);
         mVideoWidth = width;
         mVideoHeight = height;
-        mVideoXOffset = (mWidth-mVideoWidth)/2;
-        mVideoYOffset = (mHeight-mVideoHeight)/2;
+        mVideoXOffset = (mWidth - mVideoWidth) / 2;
+        mVideoYOffset = (mHeight - mVideoHeight) / 2;
         mSurfaceInputFilter.onDisplaySizeChanged(width, height);
         mSurfaceInputFilter.onInputSizeChanged(width, height);
         mSurfaceInputFilter.initSurfaceFrameBuffer(width, height);
@@ -390,5 +383,18 @@ public class CodecOutputSurface
         mImageFilter.onInputSizeChanged(width, height);
         mImageFilter.onDisplaySizeChanged(width, height);
 
+    }
+
+    @Override
+    public void setFilter(MagicFilterType type) {
+        if(type==null){
+            type = MagicFilterType.NONE;
+        }
+        if(mImageFilter!=null){
+            mImageFilter.destroy();
+            mImageFilter = null;
+        }
+        mImageFilter = MagicFilterFactory.initFilters(type);
+        mImageFilter.init();
     }
 }

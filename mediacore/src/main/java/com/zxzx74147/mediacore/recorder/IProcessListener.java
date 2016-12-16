@@ -10,10 +10,12 @@ import android.os.Looper;
 
 public abstract class IProcessListener {
 
+    private volatile int mProgress;
     private Handler mHandler = null;
     public IProcessListener(){
         mHandler = new Handler(Looper.getMainLooper());
     }
+
 
     public  void preparedDone(final int max){
         mHandler.post(new Runnable() {
@@ -34,13 +36,17 @@ public abstract class IProcessListener {
     }
 
     public  void progress(final int progress){
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                onProgress(progress);
-            }
-        });
+        mProgress = progress;
+        mHandler.removeCallbacks(mProcessRunnable);
+        mHandler.post(mProcessRunnable);
     }
+
+    private Runnable mProcessRunnable = new Runnable() {
+        @Override
+        public void run() {
+            onProgress(mProgress);
+        }
+    };
 
     public  void complete(final Uri uri){
         mHandler.post(new Runnable() {

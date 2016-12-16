@@ -23,6 +23,7 @@ public class Mp4Muxer {
     private static final String TAG = Mp4Muxer.class.getName();
 
     private final boolean VERBOSE = false;
+    private final boolean NORMAL_LOG = false;
     private MediaMuxer mMuxer = null;
     public int mVideoTrackIndex = -1;
     private int mAudioTrackIndex = -1;
@@ -132,13 +133,7 @@ public class Mp4Muxer {
         }
         final long timeUs = info.presentationTimeUs;
         if (mListener != null) {
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    mListener.onProgress((int) (timeUs));
-                }
-            });
-
+                    mListener.progress((int) (timeUs));
         }
     }
 
@@ -180,22 +175,12 @@ public class Mp4Muxer {
             try {
                 mMuxer.release();
                 if (mListener != null) {
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            mListener.onComplete(Uri.fromFile(mDstFile));
-                        }
-                    });
+                      mListener.complete(Uri.fromFile(mDstFile));
                 }
             } catch (final Exception e) {
                 e.printStackTrace();
                 if (mListener != null) {
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            mListener.onError(ErrorDefine.ERROR_MUXER_FINISH_ERROR, e.getMessage());
-                        }
-                    });
+                      mListener.error(ErrorDefine.ERROR_MUXER_FINISH_ERROR, e.getMessage());
                 }
             }
         }
