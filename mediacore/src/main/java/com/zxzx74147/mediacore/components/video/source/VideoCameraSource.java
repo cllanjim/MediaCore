@@ -116,6 +116,20 @@ public class VideoCameraSource implements IVideoSource {
 
     }
 
+    public void setFlashMode(int flashMode){
+        if (mCameraThread != null) {
+            CameraHandler rh = mCameraThread.getHandler();
+            rh.switchFlash(flashMode);
+        }
+    }
+
+    public void setCameraId(int id){
+        if (mCameraThread != null) {
+            CameraHandler rh = mCameraThread.getHandler();
+            rh.switchCamera(id);
+        }
+    }
+
 
     private SurfaceHolder.Callback mSurfaceHolderCallback = new SurfaceHolder.Callback() {
         @Override

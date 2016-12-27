@@ -160,7 +160,10 @@ public class CameraThread extends Thread implements SurfaceTexture.OnFrameAvaila
         mCameraPreviewHeight = mCameraPreviewSize.width;
     }
 
-    public void switchCamera() {
+    public void switchCamera(int id) {
+        if (id == mCameraId) {
+            return;
+        }
         releaseCamera();
         if (mCameraId == Camera.CameraInfo.CAMERA_FACING_BACK) {
             mCameraId = Camera.CameraInfo.CAMERA_FACING_FRONT;
@@ -344,7 +347,7 @@ public class CameraThread extends Thread implements SurfaceTexture.OnFrameAvaila
 
         if (mRenderWindowSurface != null) {
             mRenderWindowSurface.makeCurrent();
-            GLES20.glViewport(0, mRenderWindowHeight-mRenderHeight, mRenderWidth, mRenderHeight);
+            GLES20.glViewport(0, mRenderWindowHeight - mRenderHeight, mRenderWidth, mRenderHeight);
             mImageFilter.onDrawFrame(id, mGLCubeBuffer, mGLTextureBuffer);
             mRenderWindowSurface.swapBuffers();
         }
@@ -360,7 +363,13 @@ public class CameraThread extends Thread implements SurfaceTexture.OnFrameAvaila
 
 
     public void switchFlash(int state) {
-
+        Camera.Parameters parameters = mCamera.getParameters();
+        if (state != 0) {
+            parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);//开启
+        } else {
+            parameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);//关闭
+        }
+        mCamera.setParameters(parameters);
     }
 
     @Override

@@ -10,7 +10,10 @@ import com.zxzx74147.mediacore.components.muxer.timestamp.TimeStampGenerator;
 import com.zxzx74147.mediacore.components.util.FileUtil;
 import com.zxzx74147.mediacore.components.video.encoder.VideoEncoder;
 import com.zxzx74147.mediacore.components.video.source.IVideoSource;
+import com.zxzx74147.mediacore.components.video.source.VideoCameraSource;
 import com.zxzx74147.mediacore.components.video.source.VideoSourceFactory;
+
+import static android.R.attr.id;
 
 /**
  * Created by zhengxin on 2016/11/22.
@@ -76,6 +79,14 @@ public class MediaRecorder {
     public void stop() {
         mVideoSource.stop();
         mAudioSource.stop();
+    }
+
+    public void setCameraId(int id){
+        ((VideoCameraSource)mVideoSource).setCameraId(id);
+    }
+
+    public void setFlashMode(int flashMode){
+        ((VideoCameraSource)mVideoSource).setFlashMode(flashMode);
     }
 
 

@@ -117,8 +117,8 @@ public class CameraHandler extends Handler {
         sendMessage(obtainMessage(MSG_FRAME_AVAILABLE));
     }
 
-    public void switchCamera() {
-        sendMessage(obtainMessage(MSG_SWITCH_CAMERA, 0));
+    public void switchCamera(int id) {
+        sendMessage(obtainMessage(MSG_SWITCH_CAMERA, id));
     }
 
     public void switchFlash(int mode) {
@@ -183,7 +183,7 @@ public class CameraHandler extends Handler {
                 CameraThread.codecSurfaceChanged(msg.arg1, msg.arg2);
                 break;
             case MSG_SWITCH_CAMERA:
-                CameraThread.switchCamera();
+                CameraThread.switchCamera(msg.arg1);
                 break;
             case MSG_SWITCH_FLASH:
                 CameraThread.switchFlash(msg.arg1);
