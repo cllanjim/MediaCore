@@ -42,7 +42,7 @@ android {
 def siteUrl = 'https://github.com/zxzx74147/MediaCore'
 def gitUrl = 'https://github.com/zxzx74147/MediaCore.git'
 def issueUrl = 'https://github.com/zxzx74147/MediaCore/issues'
-version = "0.0.8"
+version = "0.0.9"
 group = "com.zxzx74147"
 install {
     repositories.mavenInstaller {

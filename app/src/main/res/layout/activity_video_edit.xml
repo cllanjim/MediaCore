@@ -46,7 +46,7 @@
                 android:layout_alignParentRight="true"
                 android:background="@null"
                 android:gravity="center"
-                android:onClick="@{handler.onDone}"
+                android:onClick="@{handler::onDone}"
                 android:paddingRight="@dimen/default_gap_30"
                 android:text="@string/publish"
                 android:textColor="@color/white" />

@@ -47,7 +47,7 @@
                 android:src="@mipmap/done"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:onClick="@{handler.onDone}"
+                android:onClick="@{handler::onDone}"
                 android:text="@string/done" />
         </RelativeLayout>
 
