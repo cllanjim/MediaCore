@@ -128,5 +128,9 @@ dependencies {
     // required, enough for most devices.
     compile 'tv.danmaku.ijk.media:ijkplayer-java:0.7.5'
     compile 'tv.danmaku.ijk.media:ijkplayer-armv7a:0.7.5'
+    // https://mvnrepository.com/artifact/com.googlecode.mp4parser/isoparser
+    compile group: 'com.googlecode.mp4parser', name: 'isoparser', version: '1.1.21'
+    compile 'net.ypresto.qtfaststartjava:qtfaststart:0.1.0'
+
 
 }

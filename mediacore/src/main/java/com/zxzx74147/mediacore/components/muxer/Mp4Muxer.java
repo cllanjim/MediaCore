@@ -4,6 +4,7 @@ import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.media.MediaMuxer;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -47,6 +48,7 @@ public class Mp4Muxer {
     public void setProcessListener(IProcessListener listener) {
         mListener = listener;
     }
+
 
     public void init() {
         try {
@@ -174,6 +176,10 @@ public class Mp4Muxer {
             mIsStarted = false;
             try {
                 mMuxer.release();
+
+                String mFastOpenFile = Mp4Util.makeMp4Faststart(mDstFile.getAbsolutePath());
+                mDstFile = new File(mFastOpenFile);
+
                 if (mListener != null) {
                       mListener.complete(Uri.fromFile(mDstFile));
                 }

@@ -37,7 +37,7 @@
         <activity android:name=".test.VideoSourceTestActivity" />
         <activity android:name=".test.RecordTestActivity" />
         <activity android:name=".test.VideoEditorTestActivity" />
-        <activity android:name=".AnimationActivity">
+        <activity android:name=".test.MetaDataTestActivity">
             <!--<intent-filter>-->
                 <!--<action android:name="android.intent.action.MAIN" />-->
 

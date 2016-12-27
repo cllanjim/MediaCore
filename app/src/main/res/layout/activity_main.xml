@@ -32,5 +32,11 @@
             android:onClick="@{handler::onVideoEdit}"
             android:text="@string/edit_video"
             android:layout_height="wrap_content" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:onClick="@{handler::onMetaEdit}"
+            android:text="@string/edit_meta_video"
+            android:layout_height="wrap_content" />
     </LinearLayout>
 </layout>

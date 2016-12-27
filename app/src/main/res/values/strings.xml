@@ -9,4 +9,5 @@
     <string name="record_video">Video Recorder</string>
     <string name="back">Back</string>
     <string name="publish">Done</string>
+    <string name="edit_meta_video">Edit meta</string>
 </resources>

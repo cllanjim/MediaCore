@@ -7,6 +7,7 @@ import android.view.View;
 
 import com.zxzx74147.mediacoredemo.base.BaseActivity;
 import com.zxzx74147.mediacoredemo.databinding.ActivityMainBinding;
+import com.zxzx74147.mediacoredemo.test.MetaDataTestActivity;
 import com.zxzx74147.mediacoredemo.test.RecordTestActivity;
 import com.zxzx74147.mediacoredemo.test.VideoEditorTestActivity;
 import com.zxzx74147.mediacoredemo.test.VideoSourceTestActivity;
@@ -46,6 +47,15 @@ public class MainActivity extends BaseActivity {
         if (result == 0) {
             ZXActivityJumpHelper.startActivity(this, VideoEditorTestActivity.class);
         }
+    }
+
+    public void onMetaEdit(View v){
+        int result = PermissionHelper.checkPermission(this, new String[]{Manifest.permission.CAMERA
+                , Manifest.permission.READ_EXTERNAL_STORAGE});
+        if (result == 0) {
+            ZXActivityJumpHelper.startActivity(this, MetaDataTestActivity.class);
+        }
+
     }
 
     @Override

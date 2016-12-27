@@ -14,7 +14,7 @@ import static com.zxzx74147.mediacoredemo.utils.ZXActivityJumpHelper.INTENT_DATA
 
 public class BaseActivity extends Activity {
 
-
+    protected String TAG = this.getClass().getName();
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode / FileSelectUtil.PICK_INTENT==1) {
