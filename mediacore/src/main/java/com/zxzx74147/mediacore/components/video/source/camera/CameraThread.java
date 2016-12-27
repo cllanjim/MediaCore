@@ -164,12 +164,9 @@ public class CameraThread extends Thread implements SurfaceTexture.OnFrameAvaila
         if (id == mCameraId) {
             return;
         }
+        mCameraId = id;
         releaseCamera();
-        if (mCameraId == Camera.CameraInfo.CAMERA_FACING_BACK) {
-            mCameraId = Camera.CameraInfo.CAMERA_FACING_FRONT;
-        } else {
-            mCameraId = Camera.CameraInfo.CAMERA_FACING_BACK;
-        }
+
         openCamera(mCameraConfig.cameraReqWidth, mCameraConfig.cameraReqHeight, mCameraConfig.cameraReqFps);
     }
 
@@ -365,7 +362,9 @@ public class CameraThread extends Thread implements SurfaceTexture.OnFrameAvaila
     public void switchFlash(int state) {
         Camera.Parameters parameters = mCamera.getParameters();
         if (state != 0) {
-            parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);//开启
+            if(parameters.getSupportedFlashModes().contains(Camera.Parameters.FLASH_MODE_TORCH)) {
+                parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);//开启
+            }
         } else {
             parameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);//关闭
         }
