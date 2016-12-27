@@ -27,7 +27,7 @@ import static com.zxzx74147.mediacore.components.util.TimeUtil.TIMEOUT_USEC;
 public class AudioMediaSource implements IAudioSource {
     private static final String TAG = AudioMediaSource.class.getName();
     private static final int BUFFER_SIZE = 1024 * 128;
-    private boolean VERBOSE = true;
+    private boolean VERBOSE = false;
 
     private int mMode = StateConfig.PROCESS_MODE_UNKOWN;
 
@@ -260,7 +260,7 @@ public class AudioMediaSource implements IAudioSource {
                                     mAudioDecoderOutputBuffers[decoderStatus].get(mInputBuffer, decodeInfo.offset, decodeInfo.size);
                                     int len = AudioNdkInterface.pcm_convert(mInputBuffer, decodeInfo.size, samplerate, channel, mOutputBuffer, expectSamplerate, expectChannel);
                                     if (VERBOSE)
-                                        Log.i(TAG, String.format("input size =%d rate=%d,output size=%d rate=%d", decodeInfo.size, samplerate, len, expectSamplerate));
+                                        Log.i(TAG, String.format("input size =%d rate=%d channel=%d ,output size=%d rate=%d channel=%d", decodeInfo.size, samplerate,channel, len, expectSamplerate,expectChannel));
                                     decodeInfo.size = len;
                                     decodeInfo.offset = 0;
                                     mOutputByteBuffer.clear();
@@ -366,7 +366,7 @@ public class AudioMediaSource implements IAudioSource {
                 if (VERBOSE) Log.d(TAG, "mAudioDecoder output buffers changed");
             } else if (outputIndex == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
                 MediaFormat newFormat = mAudioDecoder.getOutputFormat();
-                if (VERBOSE) Log.d(TAG, "mAudioDecoder output format changed: " + newFormat);
+                mergeFormat(newFormat);
             } else if (outputIndex < 0) {
 
             } else {
@@ -382,8 +382,8 @@ public class AudioMediaSource implements IAudioSource {
                 } else {
                     decodeBuffer.get(mInputBuffer, decodeInfo.offset, decodeInfo.size);
                     int len = AudioNdkInterface.pcm_convert(mInputBuffer, decodeInfo.size, samplerate, channel, mOutputBuffer, expectSamplerate, expectChannel);
-//                    if (VERBOSE)
-//                        Log.i(TAG, String.format("input size =%d rate=%d,output size=%d rate=%d", decodeInfo.size, samplerate, len, expectSamplerate));
+                    if (VERBOSE)
+                        Log.i(TAG, String.format("input size =%d rate=%d,output size=%d rate=%d", decodeInfo.size, samplerate, len, expectSamplerate));
                     decodeInfo.size = len;
                     decodeInfo.offset = 0;
                 }

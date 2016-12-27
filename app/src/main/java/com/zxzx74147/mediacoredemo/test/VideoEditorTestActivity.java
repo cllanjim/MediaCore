@@ -129,6 +129,8 @@ public class VideoEditorTestActivity extends BaseActivity {
         public void onComplete(Uri uri) {
             mProgressDialog.dismiss();
             mProgressDialog = null;
+
+
         }
     };
 
