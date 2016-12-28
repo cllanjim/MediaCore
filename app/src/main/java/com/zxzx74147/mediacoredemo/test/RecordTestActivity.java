@@ -36,6 +36,7 @@ public class RecordTestActivity extends BaseActivity {
         mMediaRecorder.setCameraId(Camera.CameraInfo.CAMERA_FACING_FRONT);
         mMediaRecorder.start();
         mBinging.progressBar.setMax(MAX_LEN);
+
     }
 
     @Override
