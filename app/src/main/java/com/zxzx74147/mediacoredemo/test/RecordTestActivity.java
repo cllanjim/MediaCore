@@ -1,6 +1,7 @@
 package com.zxzx74147.mediacoredemo.test;
 
 import android.databinding.DataBindingUtil;
+import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
@@ -30,6 +31,7 @@ public class RecordTestActivity extends BaseActivity {
         mMediaRecorder = new MediaRecorder("circle_red" + System.currentTimeMillis() + ".mp4");
         mMediaRecorder.setRecorderListener(mRecordListener);
         mMediaRecorder.setupSurfaceView(mBinging.preview);
+        mMediaRecorder.setCameraId(Camera.CameraInfo.CAMERA_FACING_FRONT);
         mMediaRecorder.start();
         mBinging.progressBar.setMax(MAX_LEN);
 

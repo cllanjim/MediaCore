@@ -165,6 +165,9 @@ public class CameraThread extends Thread implements SurfaceTexture.OnFrameAvaila
             return;
         }
         mCameraId = id;
+        if (mCamera == null) {
+            return;
+        }
         releaseCamera();
 
         openCamera(mCameraConfig.cameraReqWidth, mCameraConfig.cameraReqHeight, mCameraConfig.cameraReqFps);
@@ -363,7 +366,7 @@ public class CameraThread extends Thread implements SurfaceTexture.OnFrameAvaila
     public void switchFlash(int state) {
         Camera.Parameters parameters = mCamera.getParameters();
         if (state != 0) {
-            if(parameters.getSupportedFlashModes().contains(Camera.Parameters.FLASH_MODE_TORCH)) {
+            if (parameters.getSupportedFlashModes().contains(Camera.Parameters.FLASH_MODE_TORCH)) {
                 parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);//开启
             }
         } else {

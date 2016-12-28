@@ -1,5 +1,6 @@
 package com.zxzx74147.mediacore.components.video.source;
 
+import android.hardware.Camera;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -24,6 +25,7 @@ public class VideoCameraSource implements IVideoSource {
     private VideoEncoder mVideoEncoder = null;
     private MagicFilterType mMagicFilterType = null;
     private IProcessListener mListener = null;
+    private int mCameraId = Camera.CameraInfo.CAMERA_FACING_BACK;
 
     @Override
     public void prepare() {
@@ -37,6 +39,9 @@ public class VideoCameraSource implements IVideoSource {
         mCameraThread.waitUntilReady();
         setVideoEncoder(mVideoEncoder);
         setFilter(mMagicFilterType);
+        if(mCameraId!=Camera.CameraInfo.CAMERA_FACING_BACK){
+            setCameraId(mCameraId);
+        }
     }
 
     @Override
@@ -127,6 +132,8 @@ public class VideoCameraSource implements IVideoSource {
         if (mCameraThread != null) {
             CameraHandler rh = mCameraThread.getHandler();
             rh.switchCamera(id);
+        }else{
+            mCameraId = id;
         }
     }
 
