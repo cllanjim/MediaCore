@@ -28,6 +28,18 @@
             android:layout_alignParentBottom="true">
 
             <ImageButton
+                android:id="@+id/switch_camera"
+                android:layout_width="30dip"
+                android:layout_height="30dip"
+                android:background="@null"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/done"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:onClick="@{handler::onSwitch}"
+                android:text="@string/done" />
+
+            <ImageButton
                 android:id="@+id/record"
                 android:layout_width="100dip"
                 android:onClick="@{handler::onRecord}"

@@ -118,7 +118,7 @@ public class CameraHandler extends Handler {
     }
 
     public void switchCamera(int id) {
-        sendMessage(obtainMessage(MSG_SWITCH_CAMERA, id));
+        sendMessage(obtainMessage(MSG_SWITCH_CAMERA, id,0));
     }
 
     public void switchFlash(int mode) {

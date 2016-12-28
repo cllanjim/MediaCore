@@ -8,12 +8,11 @@ import com.zxzx74147.mediacore.components.audio.source.IAudioSource;
 import com.zxzx74147.mediacore.components.muxer.Mp4Muxer;
 import com.zxzx74147.mediacore.components.muxer.timestamp.TimeStampGenerator;
 import com.zxzx74147.mediacore.components.util.FileUtil;
+import com.zxzx74147.mediacore.components.util.StateConfig;
 import com.zxzx74147.mediacore.components.video.encoder.VideoEncoder;
 import com.zxzx74147.mediacore.components.video.source.IVideoSource;
 import com.zxzx74147.mediacore.components.video.source.VideoCameraSource;
 import com.zxzx74147.mediacore.components.video.source.VideoSourceFactory;
-
-import static android.R.attr.id;
 
 /**
  * Created by zhengxin on 2016/11/22.
@@ -26,6 +25,7 @@ public class MediaRecorder {
     private VideoEncoder mVideoEncoder;
     private Mp4Muxer mMp4Muxer;
     private IProcessListener mRecorderListener = null;
+    private int mState = StateConfig.STATE_PREPARED;
 
 
     public MediaRecorder(String outputFileName) {
@@ -54,6 +54,7 @@ public class MediaRecorder {
     }
 
     public void start() {
+        mState = StateConfig.STATE_RUNNING;
         TimeStampGenerator.sharedInstance().reset();
         try {
             mAudioSource.prepare();
@@ -66,6 +67,7 @@ public class MediaRecorder {
     }
 
     public void pause() {
+
         mVideoSource.pause();
         mAudioSource.pause();
     }
@@ -77,6 +79,10 @@ public class MediaRecorder {
     }
 
     public void stop() {
+        if(mState==StateConfig.STATE_DONE){
+            return;
+        }
+        mState = StateConfig.STATE_DONE;
         mVideoSource.stop();
         mAudioSource.stop();
     }

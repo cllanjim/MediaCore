@@ -168,6 +168,7 @@ public class CameraThread extends Thread implements SurfaceTexture.OnFrameAvaila
         releaseCamera();
 
         openCamera(mCameraConfig.cameraReqWidth, mCameraConfig.cameraReqHeight, mCameraConfig.cameraReqFps);
+        startPreview();
     }
 
     /**

@@ -39,6 +39,7 @@ public class RecordTestActivity extends BaseActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        mMediaRecorder.stop();
     }
 
     public void onRecord(View v) {
@@ -55,6 +56,11 @@ public class RecordTestActivity extends BaseActivity {
 
     public void onDone(View v) {
         mMediaRecorder.stop();
+    }
+
+    public void onSwitch(View v){
+//        mMediaRecorder.setCameraId(Camera.CameraInfo.CAMERA_FACING_FRONT);
+        mMediaRecorder.setFlashMode(1);
     }
 
     private IProcessListener mRecordListener = new IProcessListener() {
