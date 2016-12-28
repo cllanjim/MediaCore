@@ -57,7 +57,7 @@ public class MediaEditor implements IChangeFilter {
     }
 
     public void setInputMixMedia(Uri input) {
-        mInputUri = input;
+        mMixInputUri = input;
     }
 
     public void setInputMixFileDescriptor(AssetFileDescriptor fileDescriptor) {
