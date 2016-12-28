@@ -11,6 +11,7 @@ public enum  MagicFilterType {
     WHITECAT,
     BLACKCAT,
     SKINWHITEN,
+    BEAUTY,
     HEALTHY,
     SWEETS,
     ROMANCE,

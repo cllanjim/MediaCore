@@ -10,6 +10,8 @@ import com.zxzx74147.mediacore.components.muxer.timestamp.TimeStampGenerator;
 import com.zxzx74147.mediacore.components.util.FileUtil;
 import com.zxzx74147.mediacore.components.util.StateConfig;
 import com.zxzx74147.mediacore.components.video.encoder.VideoEncoder;
+import com.zxzx74147.mediacore.components.video.filter.IChangeFilter;
+import com.zxzx74147.mediacore.components.video.filter.helper.MagicFilterType;
 import com.zxzx74147.mediacore.components.video.source.IVideoSource;
 import com.zxzx74147.mediacore.components.video.source.VideoCameraSource;
 import com.zxzx74147.mediacore.components.video.source.VideoSourceFactory;
@@ -18,7 +20,7 @@ import com.zxzx74147.mediacore.components.video.source.VideoSourceFactory;
  * Created by zhengxin on 2016/11/22.
  */
 
-public class MediaRecorder {
+public class MediaRecorder implements IChangeFilter{
     private IAudioSource mAudioSource;
     private IVideoSource mVideoSource;
     private AudioEncoder mAudioEncoder;
@@ -98,5 +100,10 @@ public class MediaRecorder {
 
     public void setupSurfaceView(SurfaceView surfaceview) {
         mVideoSource.setRenderSurfaceView(surfaceview);
+    }
+
+    @Override
+    public void setFilter(MagicFilterType type){
+        ((IChangeFilter)mVideoSource).setFilter(type);
     }
 }

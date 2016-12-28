@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
+import com.zxzx74147.mediacore.components.video.filter.helper.MagicFilterType;
 import com.zxzx74147.mediacore.recorder.IProcessListener;
 import com.zxzx74147.mediacore.recorder.MediaRecorder;
 import com.zxzx74147.mediacoredemo.R;
@@ -31,6 +32,7 @@ public class RecordTestActivity extends BaseActivity {
         mMediaRecorder = new MediaRecorder("circle_red" + System.currentTimeMillis() + ".mp4");
         mMediaRecorder.setRecorderListener(mRecordListener);
         mMediaRecorder.setupSurfaceView(mBinging.preview);
+        mMediaRecorder.setFilter(MagicFilterType.BEAUTY);
         mMediaRecorder.setCameraId(Camera.CameraInfo.CAMERA_FACING_FRONT);
         mMediaRecorder.start();
         mBinging.progressBar.setMax(MAX_LEN);

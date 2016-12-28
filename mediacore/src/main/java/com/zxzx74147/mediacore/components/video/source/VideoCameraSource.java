@@ -6,6 +6,7 @@ import android.view.SurfaceView;
 
 import com.zxzx74147.mediacore.components.video.encoder.VideoEncoder;
 import com.zxzx74147.mediacore.components.video.encoder.VideoMp4Config;
+import com.zxzx74147.mediacore.components.video.filter.IChangeFilter;
 import com.zxzx74147.mediacore.components.video.filter.helper.MagicFilterType;
 import com.zxzx74147.mediacore.components.video.source.camera.CameraHandler;
 import com.zxzx74147.mediacore.components.video.source.camera.CameraThread;
@@ -16,7 +17,7 @@ import com.zxzx74147.mediacore.recorder.IProcessListener;
  * Created by zhengxin on 2016/11/21.
  */
 
-public class VideoCameraSource implements IVideoSource {
+public class VideoCameraSource implements IVideoSource ,IChangeFilter{
     private static final String TAG = VideoCameraSource.class.getName();
 
 
@@ -39,9 +40,7 @@ public class VideoCameraSource implements IVideoSource {
         mCameraThread.waitUntilReady();
         setVideoEncoder(mVideoEncoder);
         setFilter(mMagicFilterType);
-        if(mCameraId!=Camera.CameraInfo.CAMERA_FACING_BACK){
-            setCameraId(mCameraId);
-        }
+        setCameraId(mCameraId);
     }
 
     @Override
@@ -109,6 +108,7 @@ public class VideoCameraSource implements IVideoSource {
         mListener = listener;
     }
 
+    @Override
     public void setFilter(MagicFilterType type) {
         if (type == null) {
             return;
