@@ -14,6 +14,7 @@ import com.zxzx74147.mediacore.components.util.StateConfig;
 import com.zxzx74147.mediacore.recorder.IProcessListener;
 
 import java.io.File;
+import java.io.FileDescriptor;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
@@ -80,7 +81,10 @@ public class AudioMediaSource implements IAudioSource {
             } else if (mFile != null) {
                 mExtractor.setDataSource(mFile.getAbsolutePath());
             } else if (mMixInputFileDescriptor != null) {
-                mExtractor.setDataSource(mMixInputFileDescriptor.getFileDescriptor(), mMixInputFileDescriptor.getStartOffset(), mMixInputFileDescriptor.getLength());
+                FileDescriptor fd = mMixInputFileDescriptor.getFileDescriptor();
+                long start = mMixInputFileDescriptor.getStartOffset();
+                long length = mMixInputFileDescriptor.getLength();
+                mExtractor.setDataSource(fd,start,length);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -105,7 +109,7 @@ public class AudioMediaSource implements IAudioSource {
             }
         }
         if (mAudioTrack < 0) {
-            throw new IllegalArgumentException("media file does not include audio track! " + (mFile != null ? mFile.toString() : ""));
+            throw new IllegalArgumentException("media file does not include audio track! " + (mFile != null ? mFile.getPath() : " null"));
         }
         if (mEncoder != null) {
             mEncoder.setBufferSize(BUFFER_SIZE);

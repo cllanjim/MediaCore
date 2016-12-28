@@ -60,6 +60,10 @@ public class MediaEditor implements IChangeFilter {
         mMixInputUri = input;
     }
 
+    public void setInputMixMediaFile(File input) {
+        mMixInput = input;
+    }
+
     public void setInputMixFileDescriptor(AssetFileDescriptor fileDescriptor) {
         mMixInputFileDescriptor = fileDescriptor;
     }
@@ -102,9 +106,9 @@ public class MediaEditor implements IChangeFilter {
 
         IAudioSource mMixSource = null;
         if (mMixInput != null) {
-            mMixSource = AudioSourceFactory.createMediaSource(mInput);
+            mMixSource = AudioSourceFactory.createMediaSource(mMixInput);
         } else if (mMixInputUri != null) {
-            mMixSource = AudioSourceFactory.createMediaSource(mInputUri);
+            mMixSource = AudioSourceFactory.createMediaSource(mMixInputUri);
         }else if(mMixInputFileDescriptor!=null){
             mMixSource = AudioSourceFactory.createMediaSource(mMixInputFileDescriptor);
         }
