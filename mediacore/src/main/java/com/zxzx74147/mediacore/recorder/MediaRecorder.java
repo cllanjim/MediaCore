@@ -108,13 +108,13 @@ public class MediaRecorder implements IChangeFilter {
             mMp4Muxer = null;
         }
         if(mAudioEncoder!=null) {
-            mAudioEncoder.release();
             mAudioEncoder.setProcessListener(null);
+            mAudioEncoder.release();
             mAudioEncoder = null;
         }
         if(mVideoEncoder!=null) {
-            mVideoEncoder.release();
             mVideoEncoder.setProcessListener(null);
+            mVideoEncoder.release();
             mVideoEncoder = null;
         }
 

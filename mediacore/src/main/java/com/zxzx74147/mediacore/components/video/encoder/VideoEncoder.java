@@ -66,10 +66,9 @@ public class VideoEncoder {
     }
 
     public void release() {
-        if (mVideoEncoder != null) {
-            mVideoEncoder.stop();
-            mVideoEncoder.release();
-            mVideoEncoder = null;
+        if(mEncoderThread!=null){
+            mEncoderThread.interrupt();
+            mEncoderThread = null;
         }
     }
 
@@ -105,7 +104,7 @@ public class VideoEncoder {
 
             ByteBuffer[] encoderOutputBuffers = mVideoEncoder.getOutputBuffers();
             MediaCodec.BufferInfo mBufferInfo = new MediaCodec.BufferInfo();
-            while (true) {
+            while (!Thread.interrupted()) {
                 int encoderStatus = mVideoEncoder.dequeueOutputBuffer(mBufferInfo, TIMEOUT_USEC);
 
                 if (VERBOSE)
@@ -157,6 +156,11 @@ public class VideoEncoder {
                         break;
                     }
                 }
+            }
+            if (mVideoEncoder != null) {
+                mVideoEncoder.stop();
+                mVideoEncoder.release();
+                mVideoEncoder = null;
             }
         }
     };

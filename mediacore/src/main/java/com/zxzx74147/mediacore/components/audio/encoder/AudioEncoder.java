@@ -74,11 +74,11 @@ public class AudioEncoder implements IAudioRawConsumer {
 
     @Override
     public void release() {
-        if (mAudioEncoder != null) {
-            mAudioEncoder.stop();
-            mAudioEncoder.release();
-            mAudioEncoder = null;
+        if(mEncoderThread!=null){
+            mEncoderThread.interrupt();
+            mEncoderThread = null;
         }
+
     }
 
     @Override
@@ -124,7 +124,7 @@ public class AudioEncoder implements IAudioRawConsumer {
 
             ByteBuffer[] encoderOutputBuffers = mAudioEncoder.getOutputBuffers();
             MediaCodec.BufferInfo mBufferInfo = new MediaCodec.BufferInfo();
-            while (true) {
+            while (!Thread.interrupted()) {
                 int encoderStatus = mAudioEncoder.dequeueOutputBuffer(mBufferInfo, TIMEOUT_USEC);
 
                 if (VERBOSE)
@@ -183,6 +183,11 @@ public class AudioEncoder implements IAudioRawConsumer {
                         break;
                     }
                 }
+            }
+            if (mAudioEncoder != null) {
+                mAudioEncoder.stop();
+                mAudioEncoder.release();
+                mAudioEncoder = null;
             }
         }
     };
