@@ -62,10 +62,17 @@
             <com.zxzx74147.mediacore.player.FilterVideoView
                 android:id="@+id/video_view"
                 android:layout_width="match_parent"
-
+                android:visibility="gone"
                 android:layout_height="match_parent"
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true" />
+
+            <ImageView
+                android:id="@+id/image_view"
+                android:scaleType="fitCenter"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
 
             <SeekBar
                 android:id="@+id/video_seek_bar"

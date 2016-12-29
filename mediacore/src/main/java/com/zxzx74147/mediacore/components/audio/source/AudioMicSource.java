@@ -144,6 +144,11 @@ public class AudioMicSource implements IAudioSource {
 
     }
 
+    @Override
+    public long getDuration() {
+        return -1;
+    }
+
 
     private Runnable mRecordRunnable = new Runnable() {
         @Override

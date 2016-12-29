@@ -1,6 +1,7 @@
 package com.zxzx74147.mediacore.components.video.source.media;
 
 
+import android.annotation.TargetApi;
 import android.graphics.SurfaceTexture;
 import android.opengl.EGL14;
 import android.opengl.EGLConfig;
@@ -9,6 +10,7 @@ import android.opengl.EGLDisplay;
 import android.opengl.EGLExt;
 import android.opengl.EGLSurface;
 import android.opengl.GLES20;
+import android.os.Build;
 import android.util.Log;
 import android.view.Surface;
 
@@ -29,6 +31,7 @@ import java.nio.FloatBuffer;
 /**
  * Created by guoheng-iri on 2016/9/1.
  */
+@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class CodecOutputSurface
         implements SurfaceTexture.OnFrameAvailableListener, IChangeFilter {
 
@@ -97,6 +100,12 @@ public class CodecOutputSurface
         mSurfaceInputFilter.init();
         mImageFilter = MagicFilterFactory.initFilters(MagicFilterType.NONE);
         mImageFilter.init();
+    }
+
+    public void setRevert(){
+        mGLTextureBuffer.clear();
+        float[] textureCords = TextureRotationUtil.getRotation(Rotation.fromInt(0), false, false);
+        mGLTextureBuffer.put(textureCords).position(0);
     }
 
     /**
@@ -329,7 +338,7 @@ public class CodecOutputSurface
      */
     float[] mtx = new float[16];
 
-    public void drawImage(boolean invert) {
+    public void drawImage() {
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
@@ -342,6 +351,15 @@ public class CodecOutputSurface
 
             GLES20.glViewport(mVideoXOffset, mVideoYOffset, mVideoWidth, mVideoHeight);
             mImageFilter.onDrawFrame(id, mGLCubeBuffer, mGLTextureBuffer);
+        }
+    }
+
+    public void drawStaticImage(int textureId) {
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+        GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        if (mImageFilter != null) {
+            GLES20.glViewport(mVideoXOffset, mVideoYOffset, mVideoWidth, mVideoHeight);
+            mImageFilter.onDrawFrame(textureId, mGLCubeBuffer, mGLTextureBuffer);
         }
     }
 

@@ -144,6 +144,11 @@ public class AudioMixerSource implements IAudioSource {
         mOutputFormat = format;
     }
 
+    @Override
+    public long getDuration() {
+        return  mAudioSources.get(0).getDuration();
+    }
+
     private Runnable mMixRunnable = new Runnable() {
         @Override
         public void run() {

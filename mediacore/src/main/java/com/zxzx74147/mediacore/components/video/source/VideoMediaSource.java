@@ -243,7 +243,7 @@ public class VideoMediaSource implements IVideoSource ,IChangeFilter{
 
                                 outputSurface.makeCurrent(1);
                                 outputSurface.awaitNewImage();
-                                outputSurface.drawImage(true);
+                                outputSurface.drawImage();
                                 outputSurface.setPresentationTime(info.presentationTimeUs*1000);
                                 if(VERBOSE) Log.d(TAG,"timestamp="+info.presentationTimeUs);
                                 mEncoder.drainVideoRawData(false);

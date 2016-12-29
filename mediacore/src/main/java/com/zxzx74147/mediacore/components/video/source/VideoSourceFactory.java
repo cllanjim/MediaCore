@@ -20,4 +20,12 @@ public class VideoSourceFactory {
     public static IVideoSource createMediaSource(Uri uri) {
         return new VideoMediaSource(uri);
     }
+
+    public static IVideoSource createImageSource(File source){
+        return new VideoImageSource(source);
+    }
+
+    public static IVideoSource createImageSource(Uri uri) {
+        return new VideoImageSource(uri);
+    }
 }

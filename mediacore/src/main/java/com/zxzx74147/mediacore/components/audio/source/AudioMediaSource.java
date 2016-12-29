@@ -56,6 +56,7 @@ public class AudioMediaSource implements IAudioSource {
     private MediaCodec.BufferInfo decodeInfo = new MediaCodec.BufferInfo();
     private int mLeftLen = 0;
     private AudioRawData mRawData = new AudioRawData();
+    private long mDuration = 0;
 
 
     public AudioMediaSource(File mediaFile) {
@@ -105,6 +106,7 @@ public class AudioMediaSource implements IAudioSource {
                 mAudioDecoder.configure(format, null, null, 0);
                 mAudioDecoder.start();
                 mergeFormat(format);
+
                 break;
             }
         }
@@ -176,6 +178,11 @@ public class AudioMediaSource implements IAudioSource {
 
     public void setExpectFormat(MediaFormat format) {
         mExpectFormat = format;
+    }
+
+    @Override
+    public long getDuration() {
+        return mDuration;
     }
 
     //TODO merge format

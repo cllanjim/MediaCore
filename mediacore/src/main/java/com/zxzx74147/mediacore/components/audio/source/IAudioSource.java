@@ -37,6 +37,6 @@ public interface IAudioSource {
     AudioRawData pumpAudioBuffer(int expectLength);
 
      void setExpectFormat(MediaFormat format);
-
+    long getDuration();
 
 }
