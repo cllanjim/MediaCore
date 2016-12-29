@@ -23,7 +23,7 @@ import java.nio.ByteBuffer;
 public class Mp4Muxer {
     private static final String TAG = Mp4Muxer.class.getName();
 
-    private final boolean VERBOSE = true;
+    private final boolean VERBOSE = false;
     private final boolean NORMAL_LOG = false;
     private MediaMuxer mMuxer = null;
     public int mVideoTrackIndex = -1;
@@ -36,6 +36,8 @@ public class Mp4Muxer {
     private File mDstFile = null;
     private IProcessListener mListener = null;
     private Handler mHandler = null;
+    private volatile long mVideoTime = 0;
+    private volatile long mAudioTime = 0;
 
     public Mp4Muxer() {
         mHandler = new Handler(Looper.getMainLooper());
@@ -134,8 +136,10 @@ public class Mp4Muxer {
             finish();
         }
         final long timeUs = info.presentationTimeUs;
+        mVideoTime =Math.max(mVideoTime, info.presentationTimeUs);
+        int min = (int) Math.min(mVideoTime,mAudioTime);
         if (mListener != null) {
-                    mListener.progress((int) (timeUs));
+                    mListener.progress(min);
         }
     }
 
@@ -167,6 +171,11 @@ public class Mp4Muxer {
         mMuxer.writeSampleData(mAudioTrackIndex, buffer, info);
         if (mVideoFinished && mAudioFinished) {
             finish();
+        }
+        mAudioTime =Math.max(mAudioTime, info.presentationTimeUs);
+        int min = (int) Math.min(mVideoTime,mAudioTime);
+        if (mListener != null) {
+            mListener.progress(min);
         }
     }
 

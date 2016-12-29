@@ -27,7 +27,7 @@ import java.io.InputStream;
 
 public class VideoImageSource implements IVideoSource, IChangeFilter {
     private static final String TAG = VideoImageSource.class.getName();
-    private static boolean VERBOSE = true;
+    private static boolean VERBOSE = false;
     private static final int INV = 300;
     private Handler mHandler = null;
     private File mFile = null;

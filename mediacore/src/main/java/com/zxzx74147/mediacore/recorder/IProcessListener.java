@@ -36,6 +36,9 @@ public abstract class IProcessListener {
     }
 
     public  void progress(final int progress){
+        if(mProgress==progress){
+            return;
+        }
         mProgress = progress;
         mHandler.removeCallbacks(mProcessRunnable);
         mHandler.post(mProcessRunnable);
