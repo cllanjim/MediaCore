@@ -23,7 +23,7 @@ import java.nio.ByteBuffer;
 public class AudioMicSource implements IAudioSource {
 
     private static final String TAG = AudioMicSource.class.getName();
-    private static final boolean VERBOSE = true;
+    private static final boolean VERBOSE = false;
     private AudioMicConfig mMicConfig = new AudioMicConfig();
     private AudioRecord mAudioRecord = null;
 

@@ -23,7 +23,7 @@ import java.nio.ByteBuffer;
 public class Mp4Muxer {
     private static final String TAG = Mp4Muxer.class.getName();
 
-    private final boolean VERBOSE = true;
+    private final boolean VERBOSE = false;
     private final boolean NORMAL_LOG = false;
     private MediaMuxer mMuxer = null;
     public int mVideoTrackIndex = -1;
