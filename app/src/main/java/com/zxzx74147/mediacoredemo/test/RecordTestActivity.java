@@ -63,7 +63,7 @@ public class RecordTestActivity extends BaseActivity {
 
     public void onSwitch(View v){
 //        mMediaRecorder.setCameraId(Camera.CameraInfo.CAMERA_FACING_FRONT);
-        mMediaRecorder.setFlashMode(1);
+        mMediaRecorder.reset();
     }
 
     private IProcessListener mRecordListener = new IProcessListener() {

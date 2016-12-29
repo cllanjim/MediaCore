@@ -11,6 +11,7 @@ import com.zxzx74147.mediacore.ErrorDefine;
 import com.zxzx74147.mediacore.components.audio.data.AudioRawData;
 import com.zxzx74147.mediacore.components.audio.encoder.AudioMp4Config;
 import com.zxzx74147.mediacore.components.muxer.timestamp.TimeStampGenerator;
+import com.zxzx74147.mediacore.components.util.StateConfig;
 import com.zxzx74147.mediacore.recorder.IProcessListener;
 
 import java.nio.ByteBuffer;
@@ -20,8 +21,9 @@ import java.nio.ByteBuffer;
  */
 
 public class AudioMicSource implements IAudioSource {
+
     private static final String TAG = AudioMicSource.class.getName();
-    private static final boolean VERBOSE = false;
+    private static final boolean VERBOSE = true;
     private AudioMicConfig mMicConfig = new AudioMicConfig();
     private AudioRecord mAudioRecord = null;
 
@@ -35,6 +37,7 @@ public class AudioMicSource implements IAudioSource {
     private IAudioRawConsumer mAudioEncoder = null;
     private IProcessListener mListener = null;
     private MediaFormat mOutputFormat = new MediaFormat();
+    private int mState = StateConfig.STATE_NONE;
 
     @Override
     public void prepare() {
@@ -57,6 +60,7 @@ public class AudioMicSource implements IAudioSource {
             mAudioEncoder.setOutputFormat(mOutputFormat);
             mAudioEncoder.prepare();
         }
+        mState = StateConfig.STATE_PREPARED;
     }
 
     @Override
@@ -67,6 +71,7 @@ public class AudioMicSource implements IAudioSource {
         mRecordThread = new Thread(mRecordRunnable);
         mRecordThread.setName("Record Thread");
         mRecordThread.start();
+        mState = StateConfig.STATE_RUNNING;
     }
 
     @Override
@@ -82,6 +87,19 @@ public class AudioMicSource implements IAudioSource {
     @Override
     public void setAudioEncoder(IAudioRawConsumer encoder) {
         mAudioEncoder = encoder;
+        switch (mState){
+            case StateConfig.STATE_RUNNING:
+                mAudioEncoder.setOutputFormat(mOutputFormat);
+                mAudioEncoder.prepare();
+                mAudioEncoder.start();
+                break;
+            case StateConfig.STATE_PREPARED:
+                mAudioEncoder.setOutputFormat(mOutputFormat);
+                mAudioEncoder.prepare();
+                break;
+
+        }
+
 
 
     }

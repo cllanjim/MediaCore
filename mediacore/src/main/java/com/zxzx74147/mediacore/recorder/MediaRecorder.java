@@ -20,17 +20,19 @@ import com.zxzx74147.mediacore.components.video.source.VideoSourceFactory;
  * Created by zhengxin on 2016/11/22.
  */
 
-public class MediaRecorder implements IChangeFilter{
+public class MediaRecorder implements IChangeFilter {
     private IAudioSource mAudioSource;
     private IVideoSource mVideoSource;
     private AudioEncoder mAudioEncoder;
     private VideoEncoder mVideoEncoder;
     private Mp4Muxer mMp4Muxer;
+    private String outputFileName = null;
     private IProcessListener mRecorderListener = null;
     private int mState = StateConfig.STATE_PREPARED;
 
 
     public MediaRecorder(String outputFileName) {
+        this.outputFileName = outputFileName;
         mAudioSource = AudioSourceFactory.createMicSource();
         mVideoSource = VideoSourceFactory.createCameraSource();
 
@@ -48,7 +50,7 @@ public class MediaRecorder implements IChangeFilter{
         mVideoSource.setVideoEncoder(mVideoEncoder);
     }
 
-    public void setRecorderListener(IProcessListener listener){
+    public void setRecorderListener(IProcessListener listener) {
         mRecorderListener = listener;
         mAudioSource.setProcessListener(listener);
         mVideoSource.setProcessListener(listener);
@@ -63,7 +65,7 @@ public class MediaRecorder implements IChangeFilter{
             mAudioSource.start();
             mVideoSource.prepare();
             mVideoSource.start();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -81,7 +83,7 @@ public class MediaRecorder implements IChangeFilter{
     }
 
     public void stop() {
-        if(mState==StateConfig.STATE_DONE){
+        if (mState == StateConfig.STATE_DONE) {
             return;
         }
         mState = StateConfig.STATE_DONE;
@@ -89,12 +91,48 @@ public class MediaRecorder implements IChangeFilter{
         mAudioSource.stop();
     }
 
-    public void setCameraId(int id){
-        ((VideoCameraSource)mVideoSource).setCameraId(id);
+    public void setCameraId(int id) {
+        ((VideoCameraSource) mVideoSource).setCameraId(id);
     }
 
-    public void setFlashMode(int flashMode){
-        ((VideoCameraSource)mVideoSource).setFlashMode(flashMode);
+    public void setFlashMode(int flashMode) {
+        ((VideoCameraSource) mVideoSource).setFlashMode(flashMode);
+    }
+
+    public void reset() {
+        pause();
+
+        if(mMp4Muxer!=null){
+            mMp4Muxer.setProcessListener(null);
+            mMp4Muxer.release();
+            mMp4Muxer = null;
+        }
+        if(mAudioEncoder!=null) {
+            mAudioEncoder.setProcessListener(null);
+            mAudioEncoder = null;
+        }
+        if(mVideoEncoder!=null) {
+            mVideoEncoder.setProcessListener(null);
+            mVideoEncoder = null;
+        }
+
+        FileUtil.deleteFile(outputFileName);
+        TimeStampGenerator.sharedInstance().reset();
+        mMp4Muxer = new Mp4Muxer();
+        mMp4Muxer.setProcessListener(mRecorderListener);
+        mMp4Muxer.setOutputFile(FileUtil.getFile(outputFileName));
+        mMp4Muxer.init();
+
+        mAudioEncoder = new AudioEncoder();
+        mVideoEncoder = new VideoEncoder();
+        mAudioEncoder.setProcessListener(mRecorderListener);
+        mVideoEncoder.setProcessListener(mRecorderListener);
+
+        mAudioEncoder.setMuxer(mMp4Muxer);
+        mVideoEncoder.setMuxer(mMp4Muxer);
+        mAudioSource.setAudioEncoder(mAudioEncoder);
+        mVideoSource.setVideoEncoder(mVideoEncoder);
+
     }
 
 
@@ -103,7 +141,7 @@ public class MediaRecorder implements IChangeFilter{
     }
 
     @Override
-    public void setFilter(MagicFilterType type){
-        ((IChangeFilter)mVideoSource).setFilter(type);
+    public void setFilter(MagicFilterType type) {
+        ((IChangeFilter) mVideoSource).setFilter(type);
     }
 }

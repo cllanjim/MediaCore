@@ -2,13 +2,13 @@ package com.zxzx74147.mediacoredemo.test;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.AssetFileDescriptor;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
-import android.util.Log;
 import android.view.View;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -31,7 +31,6 @@ import com.zxzx74147.mediacoredemo.databinding.LayoutFilterThumbBinding;
 import com.zxzx74147.mediacoredemo.widget.recyclerview.CommonDataConverter;
 import com.zxzx74147.mediacoredemo.widget.recyclerview.CommonRecyclerViewAdapter;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;

@@ -21,7 +21,7 @@ import static com.zxzx74147.mediacore.components.util.TimeUtil.TIMEOUT_USEC;
 
 public class AudioEncoder implements IAudioRawConsumer {
     private static final String TAG = AudioEncoder.class.getName();
-    private boolean VERBOSE = false;
+    private boolean VERBOSE = true;
     private volatile MediaCodec mAudioEncoder = null;
     private Thread mEncoderThread = null;
     private Mp4Muxer mMp4Muxer = null;

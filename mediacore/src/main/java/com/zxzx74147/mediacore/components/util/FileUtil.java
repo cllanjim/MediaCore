@@ -21,4 +21,12 @@ public class FileUtil {
         }
         return file;
     }
+
+    public static void deleteFile(String path) {
+        String dst = PATH_SD_CARD+ File.separator+path;
+        File file =  new File(dst);
+        if(file.exists()){
+            file.getParentFile().delete();
+        }
+    }
 }
