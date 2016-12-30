@@ -22,6 +22,7 @@ import android.util.Log;
 import android.view.Surface;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -47,121 +48,43 @@ public class CameraUtils {
     public static Camera.Size choosePreviewSize(Camera.Parameters parms, int w, int h) {
         // Use a very small tolerance because we want an exact match.
         List<Camera.Size> sizes = parms.getSupportedPreviewSizes();
-        final double ASPECT_TOLERANCE = 0.1;
-        final double ASPECT_TOLERANCE_SECONDARY = 0.6;
-        double targetRatio = (double) w / h;
         if (sizes == null)
             return null;
 
         Camera.Size optimalSize = null;
 
-        // Start with max value and refine as we iterate over available preview sizes. This is the
-        // minimum difference between view and camera height.
-        double minDiff = Double.MAX_VALUE;
-//        double minDiff = 0f;
-
-        // Target view height
-        int targetHeight = h;
 
 
-        ArrayList<Camera.Size> selectedsize = new ArrayList<>();
-        // Try to find a preview size that matches aspect ratio and the target view size.
-        // Iterate over all available sizes and pick the largest size that can fit in the view and
-        // still maintain the aspect ratio.
+        ArrayList<ComparedableSize> comparedableSizes = new ArrayList<>();
         for (Camera.Size size : sizes) {
-            double ratio = (double) size.width / size.height;
-            Log.d(TAG,"choosePreviewSize ="+size.width + " w:h " + size.height + " , ratio : " + ratio);
-            if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE) {
-                continue;
-            }
-            selectedsize.add(size);
+            comparedableSizes.add(new ComparedableSize(size));
         }
-        if(selectedsize.size() > 0 ) {
-            for (Camera.Size size : selectedsize) {
-                if (targetHeight > size.height) {
-                    continue;
-                }
-
-                if (Math.abs(size.height - targetHeight) < minDiff) {
-                    optimalSize = size;
-                    minDiff = Math.abs(size.height - targetHeight);
-                }
-            }
-
-            if (null == optimalSize) {
-                minDiff = Double.MAX_VALUE;
-                for (Camera.Size size : selectedsize) {
-                    if (Math.abs(size.height - targetHeight) < minDiff) {
-                        optimalSize = size;
-                        minDiff = Math.abs(size.height - targetHeight);
-                    }
-                }
+        Collections.sort(comparedableSizes);
+        optimalSize = comparedableSizes.get(comparedableSizes.size()-1).size;
+        Log.i(TAG,"request size:"+w+"x"+h);
+        for (ComparedableSize comparedableSize : comparedableSizes) {
+            Log.i(TAG,"show size:"+comparedableSize.size.width+"x"+comparedableSize.size.height);
+            if(comparedableSize.size.width>=w&&comparedableSize.size.height>=h){
+                optimalSize = comparedableSize.size;
+                Log.i(TAG,"choose size:"+optimalSize.width+"x"+optimalSize.height);
+                break;
             }
         }
-        // Cannot find preview size that matches the aspect ratio, ignore the requirement
-        if (optimalSize == null) {
-            minDiff = Double.MAX_VALUE;
-            for (Camera.Size size : sizes) {
-                double ratio = (double) size.width / size.height;
-                if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE_SECONDARY) {
-                    continue;
-                }
-                if (Math.abs(size.height - targetHeight) < minDiff) {
-                    optimalSize = size;
-                    minDiff = Math.abs(size.height - targetHeight);
-                }
-            }
-        }
-
-        if (optimalSize == null) {
-            minDiff = Double.MAX_VALUE;
-            for (Camera.Size size : sizes) {
-                if (Math.abs(size.height - targetHeight) < minDiff) {
-                    optimalSize = size;
-                    minDiff = Math.abs(size.height - targetHeight);
-                }
-            }
-        }
-        if (optimalSize != null) {
-            parms.setPreviewSize(optimalSize.width, optimalSize.height);
-            Log.d(TAG,"choosePreviewSize="+optimalSize.width + " w:h " + optimalSize.height);
-        }
+        parms.setPreviewSize(optimalSize.width,optimalSize.height);
         return optimalSize;
     }
-//    /**
-//     * Attempts to find a preview size that matches the provided width and height (which
-//     * specify the dimensions of the encoded video).  If it fails to find a match it just
-//     * uses the default preview size for video.
-//     * <p>
-//     * TODO: should do a best-fit match, e.g.
-//     * https://github.com/commonsguy/cwac-camera/blob/master/camera/src/com/commonsware/cwac/camera/CameraUtils.java
-//     */
-//    public static void choosePreviewSize(Camera.Parameters parms, int width, int height) {
-//        // We should make sure that the requested MPEG size is less than the preferred
-//        // size, and has the same aspect ratio.
-//        Camera.Size ppsfv = parms.getPreferredPreviewSizeForVideo();
-//        if (ppsfv != null) {
-//            Log.d(TAG, "Camera preferred preview size for video is " +
-//                    ppsfv.width + "x" + ppsfv.height);
-//        }
-//
-//        //for (Camera.Size size : parms.getSupportedPreviewSizes()) {
-//        //    Log.d(TAG, "supported: " + size.width + "x" + size.height);
-//        //}
-//
-//        for (Camera.Size size : parms.getSupportedPreviewSizes()) {
-//            if (size.width == width && size.height == height) {
-//                parms.setPreviewSize(width, height);
-//                return;
-//            }
-//        }
-//
-//        Log.w(TAG, "Unable to set preview size to " + width + "x" + height);
-//        if (ppsfv != null) {
-//            parms.setPreviewSize(ppsfv.width, ppsfv.height);
-//        }
-//        // else use whatever the default size is
-//    }
+
+    private static class ComparedableSize implements Comparable<ComparedableSize>{
+        public Camera.Size size;
+
+        public ComparedableSize(Camera.Size size){
+            this.size = size;
+        }
+        @Override
+        public int compareTo(ComparedableSize o) {
+            return size.width*size.height-o.size.width*o.size.height;
+        }
+    }
 
     /**
      * Attempts to find a fixed preview frame rate that matches the desired frame rate.

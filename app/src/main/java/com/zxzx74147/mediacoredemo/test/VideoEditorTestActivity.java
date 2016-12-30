@@ -80,6 +80,7 @@ public class VideoEditorTestActivity extends BaseActivity {
         IntentData intentData = getIntentData();
         if (intentData != null) {
             mUri = intentData.uri;
+            mBinding.videoView.setVisibility(View.VISIBLE);
             mBinding.videoView.setVideoURI(intentData.uri);
             mBinding.videoView.start();
         }
@@ -258,10 +259,11 @@ public class VideoEditorTestActivity extends BaseActivity {
                 binding.setItem(data);
                 mAdapter.notifyDataSetChanged();
                 mBinding.videoView.setFilter(data.mType);
-
-                mGPUImage.setFilter(MagicFilterFactory.initFilters(data.mType));
-                Bitmap bm = mGPUImage.getBitmapWithFilterApplied();
-                mBinding.imageView.setImageBitmap(bm);
+                if(mMode==MODE_IMAGE) {
+                    mGPUImage.setFilter(MagicFilterFactory.initFilters(data.mType));
+                    Bitmap bm = mGPUImage.getBitmapWithFilterApplied();
+                    mBinding.imageView.setImageBitmap(bm);
+                }
 //                mBinding.videoView.seekTo(0);
             }
         });

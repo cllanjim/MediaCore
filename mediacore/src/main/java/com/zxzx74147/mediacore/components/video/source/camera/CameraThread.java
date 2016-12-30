@@ -47,10 +47,14 @@ public class CameraThread extends Thread implements SurfaceTexture.OnFrameAvaila
     private EglCore mEglCore;
     private WindowSurface mRenderWindowSurface;
     private int mRenderWidth, mRenderHeight;
+    private int mRenderOffsetX, mRenderOffsetY;
     private int mRenderWindowWidth, mRenderWindowHeight;
+
 
     private WindowSurface mCodecWindowSurface;
     private int mCodecWidth, mCodecHeight;
+    private int mCodecOffsetX, mCodecOffsetY;
+    private int mCodecWindowWidth, mCodecWindowHeight;
 
     private int textureId = OpenGlUtils.NO_TEXTURE;
 
@@ -149,13 +153,12 @@ public class CameraThread extends Thread implements SurfaceTexture.OnFrameAvaila
         Camera.Parameters parms = mCamera.getParameters();
 
         CameraUtils.choosePreviewSize(parms, desiredWidth, desiredHeight);
-
         CameraUtils.chooseFixedPreviewFps(parms, desiredFps * 1000);
-        parms.setRecordingHint(true);
+
         CameraUtils.chooseAudoFocus(parms);
+        parms.setRecordingHint(true);
         mCamera.setParameters(parms);
         Camera.Size mCameraPreviewSize = parms.getPreviewSize();
-//        mCamera.setDisplayOrientation(90);
         mCameraPreviewWidth = mCameraPreviewSize.height;
         mCameraPreviewHeight = mCameraPreviewSize.width;
     }
@@ -280,6 +283,9 @@ public class CameraThread extends Thread implements SurfaceTexture.OnFrameAvaila
         }
         try {
             mCodecWindowSurface = new WindowSurface(mEglCore, encoderSurface, true);
+            mCodecWindowWidth = mCodecWindowSurface.getWidth();
+            mCodecWindowHeight = mCodecWindowSurface.getHeight();
+            updateGeometry();
         } catch (IllegalArgumentException e) {
             if (mMainHandler != null) {
                 mMainHandler.sendEmptyMessage(MainHandler.MSG_SEND_OPEN_INVALID_SURFACE_AVAILABLE);
@@ -348,14 +354,14 @@ public class CameraThread extends Thread implements SurfaceTexture.OnFrameAvaila
 
         if (mRenderWindowSurface != null) {
             mRenderWindowSurface.makeCurrent();
-            GLES20.glViewport(0, mRenderWindowHeight - mRenderHeight, mRenderWidth, mRenderHeight);
+            GLES20.glViewport(0, mRenderOffsetX, mRenderWidth, mRenderHeight);
             mImageFilter.onDrawFrame(id, mGLCubeBuffer, mGLTextureBuffer);
             mRenderWindowSurface.swapBuffers();
         }
 
         if (mCodecWindowSurface != null && mIsRcording) {
             mCodecWindowSurface.makeCurrent();
-            GLES20.glViewport(0, 0, mCodecWidth, mCodecHeight);
+            GLES20.glViewport(mCodecOffsetX, mCodecOffsetY, mCodecWidth, mCodecHeight);
             mImageFilter.onDrawFrame(id, mGLCubeBuffer, mGLTextureBuffer);
             mCodecWindowSurface.setPresentationTime(TimeStampGenerator.sharedInstance().getVideoStamp());
             mCodecWindowSurface.swapBuffers();
@@ -384,14 +390,28 @@ public class CameraThread extends Thread implements SurfaceTexture.OnFrameAvaila
         if (mCameraPreviewWidth == 0 || mCameraPreviewHeight == 0) {
             return;
         }
-        if (mRenderHeight == 0 || mRenderWidth == 0) {
+        if (mRenderWindowWidth == 0 || mRenderWindowHeight == 0) {
             return;
         }
+
+        mRenderHeight = mRenderWindowWidth * mCameraPreviewHeight / mCameraPreviewWidth;
+        mRenderWidth = mRenderWindowWidth;
+
+        mRenderOffsetX = mRenderWindowHeight - mRenderHeight;
+
+        if (mCodecWindowWidth != 0 && mCodecWindowHeight != 0) {
+            float scaleX = mCodecWindowWidth / mCameraPreviewWidth;
+            float scaleY = mCodecWindowHeight / mCameraPreviewHeight;
+            float scale = Math.max(scaleX, scaleY);
+            mCodecWidth = (int) (mCameraPreviewWidth * scale);
+            mCodecHeight = (int) (mCameraPreviewHeight * scale);
+            mCodecOffsetX = (mCodecWindowWidth - mCodecWidth) / 2;
+            mCodecOffsetY = (mCodecWindowHeight - mCodecHeight) / 2;
+        }
+
         if (mImageFilter == null) {
             return;
         }
-        mRenderHeight = mRenderWindowWidth * mCameraPreviewHeight / mCameraPreviewWidth;
-        mRenderWidth = mRenderWindowWidth;
         mImageFilter.onDisplaySizeChanged(mRenderWidth, mRenderHeight);
         mImageFilter.onInputSizeChanged(mCameraPreviewWidth, mCameraPreviewHeight);
 
