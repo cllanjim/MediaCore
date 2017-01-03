@@ -97,8 +97,6 @@ public class VideoCameraSource implements IVideoSource ,IChangeFilter{
                 mVideoEncoder.prepare(new VideoMp4Config());
                 mVideoEncoder.start();
                 rh.sendEncoderAvailable(mVideoEncoder.getEncoderSurface());
-                rh.sendEncoderSurfaceChanged(mVideoEncoder.getConfig().width,
-                        mVideoEncoder.getConfig().height);
             }
         });
     }

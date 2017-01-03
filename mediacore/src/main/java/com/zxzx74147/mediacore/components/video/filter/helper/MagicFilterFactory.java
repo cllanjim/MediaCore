@@ -10,8 +10,7 @@ public class MagicFilterFactory {
     public static GPUImageFilter initFilters(MagicFilterType type) {
         filterType = type;
         switch (type) {
-            case NONE:
-                return new MagicNoneFilter();
+
             case WHITECAT:
                 return new MagicWhiteCatFilter();
             case BLACKCAT:
@@ -111,8 +110,10 @@ public class MagicFilterFactory {
                 return new GPUImageSharpenFilter();
             case IMAGE_ADJUST:
                 return new MagicImageAdjustFilter();
+            case NONE:
+                return new MagicNoneFilter();
             default:
-                return null;
+                return new MagicNoneFilter();
         }
     }
 

@@ -26,7 +26,6 @@ public class CameraHandler extends Handler {
     private static final int MSG_ENCODER_AVAILABLE = 6;
     private static final int MSG_SWITCH_CAMERA = 7;
     private static final int MSG_SWITCH_FLASH = 8;
-    private static final int MSG_ENCODER_SIZE_CHANGED = 9;
     private static final int MSG_ENCODER_PAUSE = 10;
     private static final int MSG_ENCODER_RESUME = 11;
     private static final int MSG_FILTER_CHANGED = 12;
@@ -71,12 +70,6 @@ public class CameraHandler extends Handler {
     public void sendEncoderAvailable(Surface surface) {
         sendMessage(obtainMessage(MSG_ENCODER_AVAILABLE,
                 surface));
-    }
-
-    public void sendEncoderSurfaceChanged( int width,
-                                   int height) {
-        // ignore format
-        sendMessage(obtainMessage(MSG_ENCODER_SIZE_CHANGED, width, height));
     }
 
     /**
@@ -178,9 +171,6 @@ public class CameraHandler extends Handler {
                 break;
             case MSG_ENCODER_AVAILABLE:
                 CameraThread.encoderSurfaceAvailable((Surface) msg.obj);
-                break;
-            case MSG_ENCODER_SIZE_CHANGED:
-                CameraThread.codecSurfaceChanged(msg.arg1, msg.arg2);
                 break;
             case MSG_SWITCH_CAMERA:
                 CameraThread.switchCamera(msg.arg1);

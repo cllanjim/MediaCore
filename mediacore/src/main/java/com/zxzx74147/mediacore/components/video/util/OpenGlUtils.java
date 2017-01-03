@@ -214,6 +214,12 @@ public class OpenGlUtils {
                 GL10.GL_TEXTURE_WRAP_T, GL10.GL_CLAMP_TO_EDGE);
 		return texture[0];
 	}
+
+	public static void releaseTextureID(int textureId){
+		int[] texture = new int[1];
+		texture[0]=textureId;
+		GLES20.glDeleteTextures(1,texture,0);
+	}
 	
 	public static String readShaderFromRawResource(final int resourceId){
 

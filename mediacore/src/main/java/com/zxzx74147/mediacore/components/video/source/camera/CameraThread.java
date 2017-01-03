@@ -41,7 +41,7 @@ public class CameraThread extends Thread implements SurfaceTexture.OnFrameAvaila
     private SurfaceTexture mCameraTexture;
     private Camera mCamera = null;
     private CameraConfig mCameraConfig = new CameraConfig();
-    private int mCameraId = Camera.CameraInfo.CAMERA_FACING_BACK;
+    private int mCameraId = Camera.CameraInfo.CAMERA_FACING_FRONT;
     private int mCameraPreviewWidth, mCameraPreviewHeight;
 
     private EglCore mEglCore;
@@ -146,13 +146,13 @@ public class CameraThread extends Thread implements SurfaceTexture.OnFrameAvaila
         if (mCamera != null) {
             CameraUtils.releaseCamera(mCamera);
             mCamera = null;
-//            throw new RuntimeException("camera already initialized");
         }
         mCamera = CameraUtils.openCamera(mCameraId);
 
         Camera.Parameters parms = mCamera.getParameters();
 
         CameraUtils.choosePreviewSize(parms, desiredWidth, desiredHeight);
+
         CameraUtils.chooseFixedPreviewFps(parms, desiredFps * 1000);
 
         CameraUtils.chooseAudoFocus(parms);
@@ -237,11 +237,14 @@ public class CameraThread extends Thread implements SurfaceTexture.OnFrameAvaila
             textureId = OpenGlUtils.getExternalOESTextureID();
             mCameraTexture = new SurfaceTexture(textureId);
 
+
+            mCameraTexture.setOnFrameAvailableListener(this);
+
             mRenderWindowWidth = mRenderWindowSurface.getWidth();
             mRenderWindowHeight = mRenderWindowSurface.getHeight();
             mRenderWidth = mRenderWindowWidth;
             mRenderHeight = mRenderWindowHeight;
-            mCameraTexture.setOnFrameAvailableListener(this);
+            updateGeometry();
 
             mImageFilter = MagicFilterFactory.initFilters(mFilterType);
             mImageFilter.init();
@@ -252,6 +255,7 @@ public class CameraThread extends Thread implements SurfaceTexture.OnFrameAvaila
             mImageFilter.onInputSizeChanged(mCameraPreviewWidth, mCameraPreviewHeight);
             mSurfaceFilter.onDisplaySizeChanged(mRenderWidth, mRenderHeight);
             mSurfaceFilter.onInputSizeChanged(mCameraPreviewWidth, mCameraPreviewHeight);
+
         }
         startPreview();
     }
@@ -262,11 +266,6 @@ public class CameraThread extends Thread implements SurfaceTexture.OnFrameAvaila
         updateGeometry();
     }
 
-    public void codecSurfaceChanged(int width, int height) {
-        mCodecWidth = width;
-        mCodecHeight = height;
-        updateGeometry();
-    }
 
     public void renderSurfaceDestroyed() {
         releaseWindowSurface();
@@ -324,7 +323,8 @@ public class CameraThread extends Thread implements SurfaceTexture.OnFrameAvaila
             mCameraTexture = null;
         }
         if (textureId != OpenGlUtils.NO_TEXTURE) {
-            //TODO
+            OpenGlUtils.releaseTextureID(textureId);
+            textureId = OpenGlUtils.NO_TEXTURE;
         }
         GlUtil.checkGlError("releaseGl done");
         mEglCore.makeNothingCurrent();
@@ -354,7 +354,7 @@ public class CameraThread extends Thread implements SurfaceTexture.OnFrameAvaila
 
         if (mRenderWindowSurface != null) {
             mRenderWindowSurface.makeCurrent();
-            GLES20.glViewport(0, mRenderOffsetX, mRenderWidth, mRenderHeight);
+            GLES20.glViewport(0, mRenderOffsetY, mRenderWidth, mRenderHeight);
             mImageFilter.onDrawFrame(id, mGLCubeBuffer, mGLTextureBuffer);
             mRenderWindowSurface.swapBuffers();
         }
@@ -397,11 +397,11 @@ public class CameraThread extends Thread implements SurfaceTexture.OnFrameAvaila
         mRenderHeight = mRenderWindowWidth * mCameraPreviewHeight / mCameraPreviewWidth;
         mRenderWidth = mRenderWindowWidth;
 
-        mRenderOffsetX = mRenderWindowHeight - mRenderHeight;
+        mRenderOffsetY = mRenderWindowHeight - mRenderHeight;
 
         if (mCodecWindowWidth != 0 && mCodecWindowHeight != 0) {
-            float scaleX = mCodecWindowWidth / mCameraPreviewWidth;
-            float scaleY = mCodecWindowHeight / mCameraPreviewHeight;
+            float scaleX = (float)mCodecWindowWidth / mCameraPreviewWidth;
+            float scaleY = (float)mCodecWindowHeight / mCameraPreviewHeight;
             float scale = Math.max(scaleX, scaleY);
             mCodecWidth = (int) (mCameraPreviewWidth * scale);
             mCodecHeight = (int) (mCameraPreviewHeight * scale);

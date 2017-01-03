@@ -5,7 +5,7 @@ package com.zxzx74147.mediacore.components.video.source.camera;
  */
 
 public class CameraConfig {
-    public int cameraReqWidth = 600;
-    public int cameraReqHeight = 480;
-    public int cameraReqFps = 24;
+    public int cameraReqWidth = 1280;
+    public int cameraReqHeight = 720;
+    public int cameraReqFps = 30;
 }
