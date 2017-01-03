@@ -1,5 +1,6 @@
 package com.zxzx74147.mediacore.components.muxer;
 
+import android.annotation.TargetApi;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.media.MediaMuxer;
@@ -19,12 +20,11 @@ import java.nio.ByteBuffer;
 /**
  * Created by zxzx74147 on 2016/11/9.
  */
-
+@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class Mp4Muxer {
     private static final String TAG = Mp4Muxer.class.getName();
 
-    private final boolean VERBOSE = false;
-    private final boolean NORMAL_LOG = false;
+    private final boolean VERBOSE = true;
     private MediaMuxer mMuxer = null;
     public int mVideoTrackIndex = -1;
     private int mAudioTrackIndex = -1;
@@ -32,12 +32,14 @@ public class Mp4Muxer {
     private volatile boolean mVideoFinished = false;
     private volatile boolean mAudioFinished = false;
     private volatile boolean mIsStarted = false;
+    private volatile boolean mIsFinish = false;
     private Object mStartLock = new Object();
     private File mDstFile = null;
     private IProcessListener mListener = null;
     private Handler mHandler = null;
     private volatile long mVideoTime = 0;
     private volatile long mAudioTime = 0;
+
 
     public Mp4Muxer() {
         mHandler = new Handler(Looper.getMainLooper());
@@ -78,6 +80,7 @@ public class Mp4Muxer {
         mAudioFinished = false;
         mIsStarted = false;
     }
+
 
     public void addVideoTrack(MediaFormat format) {
         Log.d(TAG, "video start");
@@ -121,11 +124,11 @@ public class Mp4Muxer {
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
+                return;
             }
         }
         if (VERBOSE)
             Log.d(TAG, "writeVideo = " + info.size + "|timestamp=" + info.presentationTimeUs);
-
 
         if ((info.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
             mVideoFinished = true;
@@ -159,6 +162,7 @@ public class Mp4Muxer {
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
+                return;
             }
         }
         if (VERBOSE)
@@ -168,6 +172,7 @@ public class Mp4Muxer {
             mAudioFinished = true;
             Log.d(TAG, "audio finish");
         }
+
         mMuxer.writeSampleData(mAudioTrackIndex, buffer, info);
         if (mVideoFinished && mAudioFinished) {
             finish();
@@ -179,16 +184,16 @@ public class Mp4Muxer {
         }
     }
 
-    public void finish() {
+    public synchronized void finish() {
         if (VERBOSE) Log.d(TAG, "finish");
         if (mIsStarted) {
             mIsStarted = false;
+            mAudioFinished = true;
+            mVideoFinished = true;
             try {
                 mMuxer.release();
-
                 String mFastOpenFile = Mp4Util.makeMp4Faststart(mDstFile.getAbsolutePath());
                 mDstFile = new File(mFastOpenFile);
-
                 if (mListener != null) {
                       mListener.complete(Uri.fromFile(mDstFile));
                 }
@@ -202,16 +207,16 @@ public class Mp4Muxer {
 
     }
 
-    public void release(){
-        try {
-            mMuxer.release();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+//    public void release(){
+//        try {
+//            mMuxer.release();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     public void reset() {
-        release();
+        finish();
         init();
     }
 }

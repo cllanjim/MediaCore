@@ -9,7 +9,7 @@ public class VideoMp4Config {
 
     public int width = 480;
     public int height = 640;
-    public int bitrate = 1000 * 1024;            // 1Mbps
+    public int bitrate = (int) (width*height/0.4);            // 1Mbps
     public int framerate = 24;               // 24fps
     public int iframe_interval = 5;          // 5 seconds between I-frames
 }

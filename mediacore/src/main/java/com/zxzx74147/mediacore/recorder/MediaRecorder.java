@@ -102,21 +102,25 @@ public class MediaRecorder implements IChangeFilter {
     public void reset() {
         pause();
 
-        if(mMp4Muxer!=null){
-            mMp4Muxer.setProcessListener(null);
-            mMp4Muxer.release();
-            mMp4Muxer = null;
-        }
         if(mAudioEncoder!=null) {
             mAudioEncoder.setProcessListener(null);
+            mAudioEncoder.setMuxer(null);
             mAudioEncoder.release();
             mAudioEncoder = null;
         }
         if(mVideoEncoder!=null) {
             mVideoEncoder.setProcessListener(null);
+            mVideoEncoder.setMuxer(null);
             mVideoEncoder.release();
             mVideoEncoder = null;
         }
+
+        if(mMp4Muxer!=null){
+            mMp4Muxer.setProcessListener(null);
+            mMp4Muxer.reset();
+            mMp4Muxer = null;
+        }
+
 
         FileUtil.deleteFile(outputFileName);
         TimeStampGenerator.sharedInstance().reset();

@@ -1,8 +1,10 @@
 package com.zxzx74147.mediacore.components.video.encoder;
 
+import android.annotation.TargetApi;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
+import android.os.Build;
 import android.util.Log;
 import android.view.Surface;
 
@@ -17,13 +19,13 @@ import static com.zxzx74147.mediacore.components.util.TimeUtil.TIMEOUT_USEC;
 /**
  * Created by zhengxin on 2016/11/21.
  */
-
+@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class VideoEncoder {
     private static final String TAG = VideoEncoder.class.getName();
     private boolean VERBOSE = false;
     private volatile MediaCodec mVideoEncoder = null;
+    private volatile Mp4Muxer mMp4Muxer = null;
     private Thread mEncoderThread = null;
-    private Mp4Muxer mMp4Muxer = null;
     private Surface mEncodesurface;
     private VideoMp4Config mConfig = new VideoMp4Config();
     private IProcessListener mListener = null;
@@ -31,6 +33,7 @@ public class VideoEncoder {
     public void setProcessListener(IProcessListener listener) {
         mListener = listener;
     }
+
 
 
     public void prepare(VideoMp4Config config) {
@@ -104,9 +107,11 @@ public class VideoEncoder {
 
             ByteBuffer[] encoderOutputBuffers = mVideoEncoder.getOutputBuffers();
             MediaCodec.BufferInfo mBufferInfo = new MediaCodec.BufferInfo();
-            while (!Thread.interrupted()) {
+            while (true) {
                 int encoderStatus = mVideoEncoder.dequeueOutputBuffer(mBufferInfo, TIMEOUT_USEC);
-
+                if(Thread.interrupted()){
+                    break;
+                }
                 if (VERBOSE)
                     Log.d(TAG, "index=" + encoderStatus + "|mBufferInfo.time=" + mBufferInfo.presentationTimeUs);
 

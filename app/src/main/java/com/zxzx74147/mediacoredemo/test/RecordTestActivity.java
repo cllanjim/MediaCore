@@ -62,7 +62,6 @@ public class RecordTestActivity extends BaseActivity {
     }
 
     public void onSwitch(View v){
-//        mMediaRecorder.setCameraId(Camera.CameraInfo.CAMERA_FACING_FRONT);
         mMediaRecorder.reset();
     }
 
@@ -90,6 +89,7 @@ public class RecordTestActivity extends BaseActivity {
             IntentData intentData = new IntentData();
             intentData.uri = uri;
             ZXActivityJumpHelper.startActivity(RecordTestActivity.this,VideoEditorTestActivity.class,intentData);
+            finish();
         }
     };
 }

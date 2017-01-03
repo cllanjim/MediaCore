@@ -124,9 +124,11 @@ public class AudioEncoder implements IAudioRawConsumer {
 
             ByteBuffer[] encoderOutputBuffers = mAudioEncoder.getOutputBuffers();
             MediaCodec.BufferInfo mBufferInfo = new MediaCodec.BufferInfo();
-            while (!Thread.interrupted()) {
+            while (true) {
                 int encoderStatus = mAudioEncoder.dequeueOutputBuffer(mBufferInfo, TIMEOUT_USEC);
-
+                if(Thread.interrupted()){
+                    break;
+                }
                 if (VERBOSE)
                     Log.d(TAG, "index=" + encoderStatus + "|mBufferInfo.time=" + mBufferInfo.presentationTimeUs);
 
@@ -171,7 +173,6 @@ public class AudioEncoder implements IAudioRawConsumer {
                             }
                             mLastTime = mBufferInfo.presentationTimeUs;
                         }
-
                         mMp4Muxer.writeAudio(encodedData, mBufferInfo);
                     }
                     if (VERBOSE) Log.d(TAG, "sent " + mBufferInfo.size + " audio bytes to muxer");
