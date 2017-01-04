@@ -13,7 +13,6 @@ import com.zxzx74147.mediacore.components.video.filter.base.gpuimage.GPUImageFil
 import com.zxzx74147.mediacore.components.video.filter.helper.MagicFilterFactory;
 import com.zxzx74147.mediacore.components.video.filter.helper.MagicFilterType;
 import com.zxzx74147.mediacore.components.video.source.camera.gles.EglCore;
-import com.zxzx74147.mediacore.components.video.source.camera.gles.GlUtil;
 import com.zxzx74147.mediacore.components.video.source.camera.gles.WindowSurface;
 import com.zxzx74147.mediacore.components.video.util.CameraUtils;
 import com.zxzx74147.mediacore.components.video.util.OpenGlUtils;
@@ -307,7 +306,7 @@ public class CameraThread extends Thread implements SurfaceTexture.OnFrameAvaila
 
 
     private void releaseGl() {
-        GlUtil.checkGlError("releaseGl start");
+        OpenGlUtils.checkGlError("releaseGl start");
 
         if (mRenderWindowSurface != null) {
             mRenderWindowSurface.release();
@@ -326,7 +325,7 @@ public class CameraThread extends Thread implements SurfaceTexture.OnFrameAvaila
             OpenGlUtils.releaseTextureID(textureId);
             textureId = OpenGlUtils.NO_TEXTURE;
         }
-        GlUtil.checkGlError("releaseGl done");
+        OpenGlUtils.checkGlError("releaseGl done");
         mEglCore.makeNothingCurrent();
         mEglCore.release();
     }

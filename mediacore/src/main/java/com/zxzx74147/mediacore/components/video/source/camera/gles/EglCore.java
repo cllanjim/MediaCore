@@ -16,6 +16,7 @@
 
 package com.zxzx74147.mediacore.components.video.source.camera.gles;
 
+import android.annotation.TargetApi;
 import android.graphics.SurfaceTexture;
 import android.opengl.EGL14;
 import android.opengl.EGLConfig;
@@ -23,6 +24,7 @@ import android.opengl.EGLContext;
 import android.opengl.EGLDisplay;
 import android.opengl.EGLExt;
 import android.opengl.EGLSurface;
+import android.os.Build;
 import android.util.Log;
 import android.view.Surface;
 
@@ -31,8 +33,9 @@ import android.view.Surface;
  * <p>
  * The EGLContext must only be attached to one thread at a time.  This class is not thread-safe.
  */
+@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public final class EglCore {
-    private static final String TAG = GlUtil.TAG;
+    private static final String TAG = EglCore.class.getName();
 
     /**
      * Constructor flag: surface must be recordable.  This discourages EGL from using a
@@ -310,6 +313,7 @@ public final class EglCore {
     /**
      * Sends the presentation time stamp to EGL.  Time is expressed in nanoseconds.
      */
+
     public void setPresentationTime(EGLSurface eglSurface, long nsecs) {
         EGLExt.eglPresentationTimeANDROID(mEGLDisplay, eglSurface, nsecs);
     }

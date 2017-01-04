@@ -16,11 +16,15 @@
 
 package com.zxzx74147.mediacore.components.video.source.camera.gles;
 
+import android.annotation.TargetApi;
 import android.graphics.Bitmap;
 import android.opengl.EGL14;
 import android.opengl.EGLSurface;
 import android.opengl.GLES20;
+import android.os.Build;
 import android.util.Log;
+
+import com.zxzx74147.mediacore.components.video.util.OpenGlUtils;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -34,8 +38,9 @@ import java.nio.ByteOrder;
  * <p>
  * There can be multiple surfaces associated with a single context.
  */
+@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class EglSurfaceBase {
-    protected static final String TAG = GlUtil.TAG;
+    protected static final String TAG = EglSurfaceBase.class.getName();
 
     // EglCore object we're associated with.  It may be associated with multiple surfaces.
     protected EglCore mEglCore;
@@ -179,7 +184,7 @@ public class EglSurfaceBase {
         buf.order(ByteOrder.LITTLE_ENDIAN);
         GLES20.glReadPixels(0, 0, width, height,
                 GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, buf);
-        GlUtil.checkGlError("glReadPixels");
+        OpenGlUtils.checkGlError("glReadPixels");
         buf.rewind();
 
         BufferedOutputStream bos = null;

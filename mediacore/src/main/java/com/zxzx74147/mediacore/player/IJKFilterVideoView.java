@@ -44,7 +44,6 @@ import com.zxzx74147.mediacore.components.video.filter.base.gpuimage.GPUImageFil
 import com.zxzx74147.mediacore.components.video.filter.helper.MagicFilterFactory;
 import com.zxzx74147.mediacore.components.video.filter.helper.MagicFilterType;
 import com.zxzx74147.mediacore.components.video.source.camera.gles.EglCore;
-import com.zxzx74147.mediacore.components.video.source.camera.gles.GlUtil;
 import com.zxzx74147.mediacore.components.video.source.camera.gles.WindowSurface;
 import com.zxzx74147.mediacore.components.video.util.OpenGlUtils;
 import com.zxzx74147.mediacore.components.video.util.Rotation;
@@ -1107,12 +1106,12 @@ public class IJKFilterVideoView extends SurfaceView implements MediaPlayerContro
                 mSurfaceFilter.onDrawFrame(textureId, mGLCubeBuffer, mGLTextureBuffer);
             } else {
                 int id = mSurfaceFilter.onDrawToTexture(textureId);
-                GlUtil.checkGlError("onDrawToTexture");
+                OpenGlUtils.checkGlError("onDrawToTexture");
                 mImageFilter.onDrawFrame(id, mGLCubeBuffer, mGLTextureBuffer);
-                GlUtil.checkGlError("onDrawFrame");
+                OpenGlUtils.checkGlError("onDrawFrame");
             }
             mWindowSurface.swapBuffers();
-            GlUtil.checkGlError("draw done");
+            OpenGlUtils.checkGlError("draw done");
 
         }
 

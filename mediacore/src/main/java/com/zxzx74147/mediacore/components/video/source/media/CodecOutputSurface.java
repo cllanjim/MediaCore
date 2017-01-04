@@ -19,7 +19,6 @@ import com.zxzx74147.mediacore.components.video.filter.base.MagicSurfaceInputFil
 import com.zxzx74147.mediacore.components.video.filter.base.gpuimage.GPUImageFilter;
 import com.zxzx74147.mediacore.components.video.filter.helper.MagicFilterFactory;
 import com.zxzx74147.mediacore.components.video.filter.helper.MagicFilterType;
-import com.zxzx74147.mediacore.components.video.source.camera.gles.GlUtil;
 import com.zxzx74147.mediacore.components.video.util.OpenGlUtils;
 import com.zxzx74147.mediacore.components.video.util.Rotation;
 import com.zxzx74147.mediacore.components.video.util.TextureRotationUtil;
@@ -327,7 +326,7 @@ public class CodecOutputSurface
         }
 
         // Latch the data.
-        GlUtil.checkGlError("before updateTexImage");
+        OpenGlUtils.checkGlError("before updateTexImage");
         mSurfaceTexture.updateTexImage();
     }
 
