@@ -43,12 +43,8 @@ import com.zxzx74147.mediacore.components.video.filter.base.MagicSurfaceInputFil
 import com.zxzx74147.mediacore.components.video.filter.base.gpuimage.GPUImageFilter;
 import com.zxzx74147.mediacore.components.video.filter.helper.MagicFilterFactory;
 import com.zxzx74147.mediacore.components.video.filter.helper.MagicFilterType;
-import com.zxzx74147.mediacore.components.video.source.camera.gles.Drawable2d;
 import com.zxzx74147.mediacore.components.video.source.camera.gles.EglCore;
 import com.zxzx74147.mediacore.components.video.source.camera.gles.GlUtil;
-import com.zxzx74147.mediacore.components.video.source.camera.gles.ScaledDrawable2d;
-import com.zxzx74147.mediacore.components.video.source.camera.gles.Sprite2d;
-import com.zxzx74147.mediacore.components.video.source.camera.gles.Texture2dProgram;
 import com.zxzx74147.mediacore.components.video.source.camera.gles.WindowSurface;
 import com.zxzx74147.mediacore.components.video.util.OpenGlUtils;
 import com.zxzx74147.mediacore.components.video.util.Rotation;
@@ -906,17 +902,11 @@ public class FilterVideoView extends SurfaceView implements MediaPlayerControl, 
             SurfaceTexture.OnFrameAvailableListener {
         private static final String TAG = "RenderThread";
 
-        // Orthographic projection matrix.
-        private float[] mDisplayProjectionMatrix = new float[16];
 
         private Object mStartLock = new Object();
         private boolean mReady = false;
         private EglCore mEglCore;
-        private Texture2dProgram mTexProgram;
         private WindowSurface mWindowSurface;
-        private final ScaledDrawable2d mRectDrawable =
-                new ScaledDrawable2d(Drawable2d.Prefab.RECTANGLE);
-        private final Sprite2d mRect = new Sprite2d(mRectDrawable);
 
         private int mWindowSurfaceWidth;
         private int mWindowSurfaceHeight;
