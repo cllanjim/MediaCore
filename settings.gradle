@@ -1,1 +1,1 @@
-include ':app', ':mediacore'
+include ':app', ':mediacore', ':mediacore_openh264'

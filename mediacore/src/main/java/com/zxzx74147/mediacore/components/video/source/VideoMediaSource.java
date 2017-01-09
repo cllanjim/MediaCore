@@ -11,7 +11,7 @@ import android.view.SurfaceView;
 
 import com.zxzx74147.mediacore.MediaCore;
 import com.zxzx74147.mediacore.components.video.encoder.VideoEncoder;
-import com.zxzx74147.mediacore.components.video.encoder.VideoMp4Config;
+import com.zxzx74147.mediacore.components.video.encoder.VideoConfig;
 import com.zxzx74147.mediacore.components.video.filter.IChangeFilter;
 import com.zxzx74147.mediacore.components.video.filter.helper.MagicFilterType;
 import com.zxzx74147.mediacore.components.video.source.media.CodecOutputSurface;
@@ -163,7 +163,7 @@ public class VideoMediaSource implements IVideoSource ,IChangeFilter{
                 videoWidth = videoHeight - videoWidth;
                 videoHeight = videoHeight - videoWidth;
             }
-            VideoMp4Config config = new VideoMp4Config();
+            VideoConfig config = new VideoConfig();
             config.width = videoWidth;
             config.height = videoHeight;
             mEncoder.prepare(config);

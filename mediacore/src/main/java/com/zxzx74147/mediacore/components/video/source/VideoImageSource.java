@@ -10,7 +10,7 @@ import android.view.SurfaceView;
 
 import com.zxzx74147.mediacore.MediaCore;
 import com.zxzx74147.mediacore.components.video.encoder.VideoEncoder;
-import com.zxzx74147.mediacore.components.video.encoder.VideoMp4Config;
+import com.zxzx74147.mediacore.components.video.encoder.VideoConfig;
 import com.zxzx74147.mediacore.components.video.filter.IChangeFilter;
 import com.zxzx74147.mediacore.components.video.filter.helper.MagicFilterType;
 import com.zxzx74147.mediacore.components.video.source.media.CodecOutputSurface;
@@ -140,7 +140,7 @@ public class VideoImageSource implements IVideoSource, IChangeFilter {
 
 
 
-            VideoMp4Config config = new VideoMp4Config();
+            VideoConfig config = new VideoConfig();
             config.width = videoWidth;
             config.height = videoHeight;
             config.framerate = 1000/INV;

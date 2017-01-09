@@ -110,7 +110,11 @@ public class CameraThread extends Thread implements SurfaceTexture.OnFrameAvaila
             e.printStackTrace();
         } finally {
             Log.d(TAG, "looper quit");
-            release();
+            try {
+                release();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
             synchronized (mStartLock) {
                 mReady = false;
             }

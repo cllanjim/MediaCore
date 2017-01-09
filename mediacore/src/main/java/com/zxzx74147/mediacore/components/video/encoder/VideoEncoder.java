@@ -27,7 +27,7 @@ public class VideoEncoder {
     private volatile Mp4Muxer mMp4Muxer = null;
     private Thread mEncoderThread = null;
     private Surface mEncodesurface;
-    private VideoMp4Config mConfig = new VideoMp4Config();
+    private VideoConfig mConfig = new VideoConfig();
     private IProcessListener mListener = null;
 
     public void setProcessListener(IProcessListener listener) {
@@ -36,11 +36,11 @@ public class VideoEncoder {
 
 
 
-    public void prepare(VideoMp4Config config) {
+    public void prepare(VideoConfig config) {
         mConfig = config;
         release();
 
-        MediaFormat format = MediaFormat.createVideoFormat(VideoMp4Config.MIME_TYPE, mConfig.width, mConfig.height);
+        MediaFormat format = MediaFormat.createVideoFormat(VideoConfig.MIME_TYPE, mConfig.width, mConfig.height);
 
         // Set some properties.  Failing to specify some of these can cause the MediaCodec
         // configure() call to throw an unhelpful exception.
@@ -53,7 +53,7 @@ public class VideoEncoder {
         mVideoEncoder = null;
 
         try {
-            mVideoEncoder = MediaCodec.createEncoderByType(VideoMp4Config.MIME_TYPE);
+            mVideoEncoder = MediaCodec.createEncoderByType(VideoConfig.MIME_TYPE);
             mVideoEncoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
             mEncodesurface = mVideoEncoder.createInputSurface();
             mVideoEncoder.start();
@@ -64,7 +64,7 @@ public class VideoEncoder {
 
     }
 
-    public VideoMp4Config getConfig(){
+    public VideoConfig getConfig(){
         return mConfig;
     }
 

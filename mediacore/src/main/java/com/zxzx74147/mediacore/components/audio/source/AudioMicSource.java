@@ -9,7 +9,7 @@ import android.util.Log;
 
 import com.zxzx74147.mediacore.ErrorDefine;
 import com.zxzx74147.mediacore.components.audio.data.AudioRawData;
-import com.zxzx74147.mediacore.components.audio.encoder.AudioMp4Config;
+import com.zxzx74147.mediacore.components.audio.encoder.AudioConfig;
 import com.zxzx74147.mediacore.components.muxer.timestamp.TimeStampGenerator;
 import com.zxzx74147.mediacore.components.util.StateConfig;
 import com.zxzx74147.mediacore.recorder.IProcessListener;
@@ -42,7 +42,7 @@ public class AudioMicSource implements IAudioSource {
     @Override
     public void prepare() {
         mBufferSize = AudioRecord.getMinBufferSize(mMicConfig.frequence, mMicConfig.channelConfig, mMicConfig.audioEncoding);
-        mOutputFormat = MediaFormat.createAudioFormat(AudioMp4Config.MIME_TYPE_AUDIO,mMicConfig.frequence, mMicConfig.channelConfig== AudioFormat.CHANNEL_IN_MONO? 1:2 );
+        mOutputFormat = MediaFormat.createAudioFormat(AudioConfig.MIME_TYPE_AUDIO,mMicConfig.frequence, mMicConfig.channelConfig== AudioFormat.CHANNEL_IN_MONO? 1:2 );
         //实例化AudioRecord
         mAudioRecord = new AudioRecord(MediaRecorder.AudioSource.CAMCORDER, mMicConfig.frequence, mMicConfig.channelConfig, mMicConfig.audioEncoding, mBufferSize);
         if (mInputBuffer == null) {
@@ -154,6 +154,7 @@ public class AudioMicSource implements IAudioSource {
         @Override
         public void run() {
             try {
+                android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
 
                 while (true) {
                     //从bufferSize中读取字节，返回读取的short个数

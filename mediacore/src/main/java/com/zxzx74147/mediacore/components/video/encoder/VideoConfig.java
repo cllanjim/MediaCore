@@ -4,7 +4,7 @@ package com.zxzx74147.mediacore.components.video.encoder;
  * Created by zhengxin on 2016/11/22.
  */
 
-public class VideoMp4Config {
+public class VideoConfig {
     public static final String MIME_TYPE = "video/avc";    // H.264 Advanced Video Coding
 
     public int width = 480;

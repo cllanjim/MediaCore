@@ -6,7 +6,7 @@ import android.media.MediaCodecInfo;
  * Created by zhengxin on 2016/11/21.
  */
 
-public class AudioMp4Config {
+public class AudioConfig {
 
     public static final String MIME_TYPE_AUDIO = "audio/mp4a-latm";    // H.264 Advanced Video Coding
     public static final int OUTPUT_AUDIO_BIT_RATE = 16 * 1024;         //32K

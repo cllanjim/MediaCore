@@ -12,7 +12,7 @@ import com.zxzx74147.mediacore.recorder.IProcessListener;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import static com.zxzx74147.mediacore.components.audio.encoder.AudioMp4Config.MIME_TYPE_AUDIO;
+import static com.zxzx74147.mediacore.components.audio.encoder.AudioConfig.MIME_TYPE_AUDIO;
 import static com.zxzx74147.mediacore.components.util.TimeUtil.TIMEOUT_USEC;
 
 /**
@@ -44,10 +44,10 @@ public class AudioEncoder implements IAudioRawConsumer {
             mOutputFormat = MediaFormat.createAudioFormat(
                     MIME_TYPE_AUDIO, samplerate, channel);
 
-            mOutputFormat.setInteger(MediaFormat.KEY_BIT_RATE, AudioMp4Config.OUTPUT_AUDIO_BIT_RATE);
-            mOutputFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, AudioMp4Config.OUTPUT_AUDIO_AAC_PROFILE);
+            mOutputFormat.setInteger(MediaFormat.KEY_BIT_RATE, AudioConfig.OUTPUT_AUDIO_BIT_RATE);
+            mOutputFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, AudioConfig.OUTPUT_AUDIO_AAC_PROFILE);
             mOutputFormat.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, bufferSize * 2);
-            mAudioEncoder = MediaCodec.createEncoderByType(AudioMp4Config.MIME_TYPE_AUDIO);
+            mAudioEncoder = MediaCodec.createEncoderByType(AudioConfig.MIME_TYPE_AUDIO);
             mAudioEncoder.configure(mOutputFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
             mAudioEncoder.start();
 
