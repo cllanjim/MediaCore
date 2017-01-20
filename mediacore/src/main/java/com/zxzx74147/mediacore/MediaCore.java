@@ -22,6 +22,4 @@ public class MediaCore {
         return mContext;
     }
 
-
-
 }

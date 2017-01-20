@@ -11,6 +11,7 @@ import com.zxzx74147.mediacoredemo.R;
 import com.zxzx74147.mediacoredemo.base.BaseActivity;
 import com.zxzx74147.mediacoredemo.databinding.ActivityMetadataTestBinding;
 import com.zxzx74147.mediacoredemo.utils.UriUtils;
+import com.zxzx74147.mediacoredemo.widget.TextureVideoView;
 
 import net.ypresto.qtfaststart.QtFastStart;
 
@@ -27,7 +28,9 @@ public class MetaDataTestActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         mBinging = DataBindingUtil.setContentView(this, R.layout.activity_metadata_test);
         mBinging.setHandler(this);
-
+        mBinging.video.setScaleType(TextureVideoView.ScaleType.CENTER_CROP);
+        mBinging.video.setDataSource("http://pws.myhug.cn/static/cone/video/csys_2.mp4");
+        mBinging.video.play();
     }
 
     public void onSelect(View v) {
@@ -48,19 +51,6 @@ public class MetaDataTestActivity extends BaseActivity {
                             String dst = path.replace(".mp4", "_bak1.mp4");
                             boolean ret = QtFastStart.fastStart(new File(path),new File(dst));
                             Log.i(TAG,"ret="+ret);
-//                            Movie movie = MovieCreator.build(path);
-//
-//                            Movie result = new Movie();
-//
-//                            for (Track t : movie.getTracks()) {
-//                                result.addTrack(t);
-//                            }
-//
-//                            Container out = new DefaultMp4Builder().build(result);
-//
-//                            FileChannel fc = new RandomAccessFile(path.replace(".mp4", "_bak.mp4"), "rw").getChannel();
-//                            out.writeContainer(fc);
-//                            fc.close();
                         } catch (IOException e) {
                             e.printStackTrace();
                         } catch (QtFastStart.MalformedFileException e) {

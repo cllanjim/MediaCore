@@ -98,7 +98,7 @@ public class VideoEditorTestActivity extends BaseActivity {
             mEditor = new MediaEditor();
             try {
                 AssetFileDescriptor music = getAssets().openFd("music/301.mp3");
-                mEditor.setInputMixFileDescriptor(music);
+//                mEditor.setInputMixFileDescriptor(music);
             } catch (IOException e) {
                 e.printStackTrace();
             }

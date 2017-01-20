@@ -49,8 +49,8 @@ android {
 def siteUrl = 'https://github.com/zxzx74147/MediaCore'
 def gitUrl = 'https://github.com/zxzx74147/MediaCore.git'
 def issueUrl = 'https://github.com/zxzx74147/MediaCore/issues'
-version = "0.2.4"
-group = "com.zxzx74147"
+version = "0.2.8"
+group = "com.zxzx74147.media"
 install {
     repositories.mavenInstaller {
         // This generates POM.xml with proper parameters

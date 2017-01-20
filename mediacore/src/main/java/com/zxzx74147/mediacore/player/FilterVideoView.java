@@ -794,13 +794,16 @@ public class FilterVideoView extends SurfaceView implements MediaPlayerControl, 
         mTargetState = STATE_PLAYING;
     }
 
+    private int mPosition = 0;
     public void pause() {
         if (isInPlaybackState()) {
             if (mMediaPlayer.isPlaying()) {
                 mMediaPlayer.pause();
+                mPosition = mMediaPlayer.getCurrentPosition();
                 mCurrentState = STATE_PAUSED;
             }
         }
+
         mTargetState = STATE_PAUSED;
     }
 
@@ -809,17 +812,13 @@ public class FilterVideoView extends SurfaceView implements MediaPlayerControl, 
     }
 
     public void resume() {
-        openVideo();
-    }
-
-    public void resume2() {
-        if (!isInPlaybackState()) {
-            if (mMediaPlayer != null && !mMediaPlayer.isPlaying()) {
-                mMediaPlayer.start();
-                mCurrentState = STATE_PLAYING;
-            }
+        start();
+        if(mPosition>0){
+            seekTo(mPosition);
+            mPosition = 0;
         }
     }
+
 
     public int getDuration() {
         if (isInPlaybackState()) {

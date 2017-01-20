@@ -32,7 +32,6 @@ public class Mp4Muxer {
     private volatile boolean mVideoFinished = false;
     private volatile boolean mAudioFinished = false;
     private volatile boolean mIsStarted = false;
-    private volatile boolean mIsFinish = false;
     private Object mStartLock = new Object();
     private File mDstFile = null;
     private IProcessListener mListener = null;

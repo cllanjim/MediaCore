@@ -44,6 +44,7 @@ public class AudioMediaSource implements IAudioSource {
     private MediaFormat mOutputFormat = null;
     private MediaFormat mExpectFormat = null;
     private MediaFormat mRawOutputFormat = null;
+    private boolean isEncoderStarted = false;
 
     private boolean mLoop = false;
     private boolean mIsOver = false;
@@ -115,11 +116,16 @@ public class AudioMediaSource implements IAudioSource {
         }
         if (mEncoder != null) {
             mEncoder.setBufferSize(BUFFER_SIZE);
-            mEncoder.setOutputFormat(mOutputFormat);
-            mEncoder.prepare();
-
         }
 
+    }
+
+    private void startEncoder(){
+        mEncoder.setBufferSize(BUFFER_SIZE);
+        mEncoder.setOutputFormat(mOutputFormat);
+        mEncoder.prepare();
+        mEncoder.start();
+        isEncoderStarted = true;
     }
 
     @Override
@@ -137,7 +143,6 @@ public class AudioMediaSource implements IAudioSource {
         if (mEncoder == null) {
             throw new IllegalStateException("The audio encoder is null ! ");
         }
-        mEncoder.start();
         mExtractThread = new Thread(mExtractRunnable);
         mExtractThread.setName("Extract audio thread");
         mExtractThread.start();
@@ -255,9 +260,15 @@ public class AudioMediaSource implements IAudioSource {
                         if ((decodeInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
                             if (VERBOSE) Log.d(TAG, "output EOS");
                             decoderDone = true;
+                            if(!isEncoderStarted){
+                                startEncoder();
+                            }
                             mEncoder.drainAudioRawData(true, null, decodeInfo);
                         } else {
                             if (decodeInfo.size > 0) {
+                                if(!isEncoderStarted){
+                                    startEncoder();
+                                }
                                 mAudioDecoderOutputBuffers[decoderStatus].position(decodeInfo.offset);
                                 mAudioDecoderOutputBuffers[decoderStatus].limit(decodeInfo.offset + decodeInfo.size);
                                 int samplerate = mRawOutputFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE);

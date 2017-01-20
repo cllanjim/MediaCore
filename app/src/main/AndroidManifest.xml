@@ -27,17 +27,18 @@
             android:name="main"
             android:value="Channel ID" />
 
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity" android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".test.VideoSourceTestActivity" />
-        <activity android:name=".test.RecordTestActivity" />
-        <activity android:name=".test.VideoEditorTestActivity" />
-        <activity android:name=".test.MetaDataTestActivity">
+        <activity android:name=".test.VideoSourceTestActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".test.RecordTestActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".test.VideoEditorTestActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".test.MetaDataTestActivity" android:screenOrientation="portrait">
             <!--<intent-filter>-->
                 <!--<action android:name="android.intent.action.MAIN" />-->
 
