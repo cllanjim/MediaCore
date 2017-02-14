@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "948936866643",
+    "firebase_url": "https://mediacore-3e99a.firebaseio.com",
+    "project_id": "mediacore-3e99a",
+    "storage_bucket": "mediacore-3e99a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:948936866643:android:4a51aadd10d19ca9",
+        "android_client_info": {
+          "package_name": "com.zxzx74147.mediacore"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "948936866643-k8q34v64tnqaeic23c6nqnm8d6mgiqsb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC5Ca5mLFLiSRDxNy68X6vf_hCd-E_wfRI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -4,12 +4,11 @@
     <item android:drawable="@drawable/ring_white" />
 
     <item
-        android:bottom="@dimen/default_gap_25"
-        android:left="@dimen/default_gap_25"
-        android:right="@dimen/default_gap_25"
-        android:top="@dimen/default_gap_25">
-        <shape android:shape="oval">
-
+        android:bottom="@dimen/default_gap_40"
+        android:left="@dimen/default_gap_40"
+        android:right="@dimen/default_gap_40"
+        android:top="@dimen/default_gap_40">
+        <shape android:shape="rectangle">
             <solid android:color="@color/red" />
         </shape>
     </item>

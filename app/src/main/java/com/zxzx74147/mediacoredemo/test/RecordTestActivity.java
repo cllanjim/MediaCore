@@ -29,7 +29,7 @@ public class RecordTestActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         mBinging = DataBindingUtil.setContentView(this, R.layout.activity_record_test);
         mBinging.setHandler(this);
-        mMediaRecorder = new MediaRecorder("circle_red" + System.currentTimeMillis() + ".mp4");
+        mMediaRecorder = new MediaRecorder("record_" + System.currentTimeMillis() + ".mp4");
         mMediaRecorder.setRecorderListener(mRecordListener);
         mMediaRecorder.setupSurfaceView(mBinging.preview);
         mMediaRecorder.setFilter(MagicFilterType.BEAUTY);
@@ -51,7 +51,7 @@ public class RecordTestActivity extends BaseActivity {
             mMediaRecorder.pause();
             mIsRecroding = false;
         }else{
-            mBinging.record.setImageResource(R.drawable.circle_yellow);
+            mBinging.record.setImageResource(R.drawable.rect_red);
             mMediaRecorder.resume();
             mIsRecroding = true;
         }

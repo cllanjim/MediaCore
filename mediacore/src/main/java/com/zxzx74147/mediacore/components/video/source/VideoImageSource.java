@@ -144,7 +144,7 @@ public class VideoImageSource implements IVideoSource, IChangeFilter {
             config.width = videoWidth;
             config.height = videoHeight;
             config.framerate = 1000/INV;
-            config.iframe_interval = 10;
+            config.iframe_interval = 15;
             mEncoder.prepare(config);
             outputSurface = new CodecOutputSurface(config.width, config.height, mEncoder.getEncoderSurface());
             outputSurface.setRevert();
