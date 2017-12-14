@@ -26,6 +26,7 @@ JNIEXPORT jint JNICALL Java_com_zxzx74147_mediacore_components_audio_mixer_Audio
 }
 #endif
 
+PcmProcess process;
 JNIEXPORT jint JNICALL Java_com_zxzx74147_mediacore_components_audio_mixer_AudioNdkInterface_pcm_1convert
         (JNIEnv * env, jclass m_class, jbyteArray pbyteInBuffer, jint dwInLength, jint dwInSampleRate, jint dwChannal,
          jbyteArray pbyteOutBuffer, jint dwOutSampleRate,jint dwOutChannel){
@@ -33,7 +34,7 @@ JNIEXPORT jint JNICALL Java_com_zxzx74147_mediacore_components_audio_mixer_Audio
     jbyte* input = env->GetByteArrayElements(pbyteInBuffer,&isCopy);
     jbyte* output = env->GetByteArrayElements(pbyteOutBuffer,&isCopy);
     unsigned int dstLen = env->GetArrayLength(pbyteOutBuffer);
-    PcmProcess process;
+
     process.pcm_convert((const unsigned char *) input, dwInLength, dwInSampleRate, dwChannal,
                         (unsigned char *) output, dstLen, dwOutSampleRate,dwOutChannel);
 
