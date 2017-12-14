@@ -8,6 +8,7 @@ import android.os.Build;
 import android.util.Log;
 import android.view.Surface;
 
+import com.zxzx74147.mediacore.ErrorDefine;
 import com.zxzx74147.mediacore.components.muxer.Mp4Muxer;
 import com.zxzx74147.mediacore.recorder.IProcessListener;
 
@@ -29,11 +30,12 @@ public class VideoEncoder {
     private Surface mEncodesurface;
     private VideoConfig mConfig = new VideoConfig();
     private IProcessListener mListener = null;
+    private volatile boolean mIsStart = false;
+    private volatile boolean mIsStop = false;
 
     public void setProcessListener(IProcessListener listener) {
         mListener = listener;
     }
-
 
 
     public void prepare(VideoConfig config) {
@@ -57,19 +59,22 @@ public class VideoEncoder {
             mVideoEncoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
             mEncodesurface = mVideoEncoder.createInputSurface();
             mVideoEncoder.start();
+            mIsStart = true;
         } catch (IOException ioe) {
-
+            if(mListener!=null){
+                mListener.onError(ErrorDefine.ERROR_VIDEO_ENCODER_INIT_ERROR,"failed init mVideoEncoder");
+            }
             throw new RuntimeException("failed init mVideoEncoder", ioe);
         }
 
     }
 
-    public VideoConfig getConfig(){
+    public VideoConfig getConfig() {
         return mConfig;
     }
 
     public void release() {
-        if(mEncoderThread!=null){
+        if (mEncoderThread != null) {
             mEncoderThread.interrupt();
             mEncoderThread = null;
         }
@@ -80,6 +85,9 @@ public class VideoEncoder {
             mEncoderThread.interrupt();
             mEncoderThread = null;
         }
+        if(!mIsStart){
+            return;
+        }
         mEncoderThread = new Thread(mEncoderRunnable);
         mEncoderThread.setName("Encoder Thread");
         mEncoderThread.start();
@@ -89,14 +97,16 @@ public class VideoEncoder {
         mMp4Muxer = muxer;
     }
 
-    public Surface getEncoderSurface(){
+    public Surface getEncoderSurface() {
         return mEncodesurface;
     }
 
     public int drainVideoRawData(boolean endOfStream) {
         if (endOfStream) {
             if (VERBOSE) Log.d(TAG, "sending EOS to mVideoEncoder");
-            mVideoEncoder.signalEndOfInputStream();
+            if(mIsStart&&!mIsStop) {
+                mVideoEncoder.signalEndOfInputStream();
+            }
         }
         return 0;
     }
@@ -109,7 +119,7 @@ public class VideoEncoder {
             MediaCodec.BufferInfo mBufferInfo = new MediaCodec.BufferInfo();
             while (true) {
                 int encoderStatus = mVideoEncoder.dequeueOutputBuffer(mBufferInfo, TIMEOUT_USEC);
-                if(Thread.interrupted()){
+                if (Thread.interrupted()) {
                     break;
                 }
                 if (VERBOSE)
@@ -149,7 +159,7 @@ public class VideoEncoder {
                         mBufferInfo.size = 0;
                     }
 
-                    if (mMp4Muxer != null) {
+                    if (mMp4Muxer != null && mBufferInfo.size != 0) {
                         mMp4Muxer.writeVideo(encodedData, mBufferInfo);
                     }
                     if (VERBOSE) Log.d(TAG, "sent " + mBufferInfo.size + " audio bytes to muxer");
@@ -163,6 +173,7 @@ public class VideoEncoder {
                 }
             }
             if (mVideoEncoder != null) {
+                mIsStop = true;
                 mVideoEncoder.stop();
                 mVideoEncoder.release();
                 mVideoEncoder = null;

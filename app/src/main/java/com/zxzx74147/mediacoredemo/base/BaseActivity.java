@@ -17,6 +17,7 @@ public class BaseActivity extends Activity {
     protected String TAG = this.getClass().getName();
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode / FileSelectUtil.PICK_INTENT==1) {
             FileSelectUtil.dealOnActivityResult(requestCode, resultCode, data);
         }

@@ -9,4 +9,5 @@
 	<string name="done">完成</string>
 	<string name="publish">完成</string>
 	<string name="record">录制</string>
+	<string name="app_name">MediaCore示例</string>
 </resources>
